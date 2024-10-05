@@ -47,7 +47,7 @@ public class ApplicationController {
 
     // Update an existing employee
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+    public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
         logger.info("Updating employee with ID: {}", id);
         employee.setId(id);
         employeeService.updateEmployee(employee);
