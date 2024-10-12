@@ -6,6 +6,7 @@
 		<version>3.3.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.spring.project.DataValidation</groupId>
 	<artifactId>CrudApplication</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -13,40 +14,58 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>17</java.version> <!-- Ensure your project is set to Java 17 -->
-		<spring.version>3.3.4</spring.version> <!-- Use property for version consistency -->
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
+		<!-- Spring Data JPA for database interactions -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<!-- Spring Web for building RESTful APIs -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
+		<!-- Hibernate Validator for Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>8.0.0.Final</version> <!-- Updated to the latest version compatible with Spring Boot 3.x -->
+			<version>8.0.0.Final</version> <!--$NO-MVN-MAN-VER$-->
 		</dependency>
+
+		<!-- Jakarta Validation API for validation annotations -->
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.2</version> <!-- Ensure this is compatible with your Hibernate Validator -->
+			<version>3.0.2</version> <!--$NO-MVN-MAN-VER$-->
 		</dependency>
+
+		<!-- Lombok for reducing boilerplate code (Optional) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Spring Boot DevTools for automatic restart and hot reload -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Spring Boot Starter Test for testing dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -54,13 +73,12 @@
 		</dependency>
 	</dependencies>
 
-	
-
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!-- Remove Lombok exclusion if you are using it -->
 				<configuration>
 					<excludes>
 						<exclude>
