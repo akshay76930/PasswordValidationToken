@@ -24,8 +24,17 @@ public class Employee implements Serializable {
     private String gender;
     private String email;
     private String password;
+    private String username;  // Add this field
 
-    // Default constructor
+    public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	// Default constructor
     public Employee() {}
 
     // Parameterized constructor

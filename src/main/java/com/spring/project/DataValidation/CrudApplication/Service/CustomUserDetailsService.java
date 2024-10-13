@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Convert the Employee entity to a Spring Security UserDetails object
         return new org.springframework.security.core.userdetails.User(
-            employee.getName(),
+            employee.getUsername(),
             employee.getPassword(),
             // Convert roles/authorities, if applicable
             new ArrayList<>() // Here, add authorities/roles if necessary
