@@ -2,6 +2,9 @@ package com.spring.project.DataValidation.CrudApplication.Controller;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +23,6 @@ import com.spring.project.DataValidation.CrudApplication.Service.EmployeeService
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/employees")

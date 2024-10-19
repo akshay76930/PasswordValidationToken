@@ -1,22 +1,23 @@
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
+
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Entity  // This tells Hibernate to treat this class as a JPA entity
-@Table(name = "employee")  // Optional: Specifies the table name
+@Entity
+@Table(name = "employee")
 public class Employee implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
 
-    @Id  // This is the primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-increment strategy
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -24,20 +25,9 @@ public class Employee implements Serializable {
     private String gender;
     private String email;
     private String password;
-    private String username;  // Add this field
 
-    public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	// Default constructor
     public Employee() {}
 
-    // Parameterized constructor
     public Employee(Long id, String name, String contact, String gender, String email, String password) {
         this.id = id;
         this.name = name;
@@ -47,7 +37,6 @@ public class Employee implements Serializable {
         this.password = password;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -96,13 +85,11 @@ public class Employee implements Serializable {
         this.password = password;
     }
 
-    // Override toString method
     @Override
     public String toString() {
         return "Employee [id=" + id + ", name=" + name + ", contact=" + contact + ", gender=" + gender + ", email=" + email + ", password=" + password + "]";
     }
 
-    // Override equals and hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

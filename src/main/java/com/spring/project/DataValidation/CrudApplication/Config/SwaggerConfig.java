@@ -10,7 +10,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
 
-import java.util.List;
+import java.util.Arrays;
 
 @Configuration
 public class SwaggerConfig {
@@ -18,8 +18,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-            // Add servers for different environments (e.g., production, staging)
-            .servers(List.of(
+            .servers(Arrays.asList(
                 new Server().url("http://localhost:8080").description("Local development server"),
                 new Server().url("https://api.production.com").description("Production server")
             ))
@@ -35,7 +34,6 @@ public class SwaggerConfig {
                 .license(new License()
                     .name("Apache 2.0")
                     .url("http://springdoc.org")))
-            // Add security schema for authentication (e.g., Bearer token)
             .components(new Components()
                 .addSecuritySchemes("bearerAuth", new SecurityScheme()
                     .type(SecurityScheme.Type.HTTP)
