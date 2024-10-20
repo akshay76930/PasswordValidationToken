@@ -14,7 +14,7 @@ public class ExceptionPasswordValidation {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        // Using streams to collect error messages into a map
+       
         Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
                         error -> error.getField(),        

@@ -47,6 +47,22 @@ public class ApplicationController {
         return ResponseEntity.ok(employees);
     }
 
+    @Operation(summary = "Get an employee by ID", description = "Fetches an employee by their ID from the database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully fetched the employee"),
+            @ApiResponse(responseCode = "404", description = "Employee not found") })
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        logger.info("Fetching employee with ID: {}", id);
+
+        // Retrieve the employee using the service and handle Optional
+        Employee employee = employeeService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        return ResponseEntity.ok(employee);
+    }
+    
+    
     @Operation(summary = "Insert a new employee", description = "Adds a new employee to the database")
     @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Employee successfully created") })
     @PostMapping
