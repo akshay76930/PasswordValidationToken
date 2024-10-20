@@ -1,6 +1,7 @@
 package com.spring.project.DataValidation.CrudApplication.Controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -28,52 +29,64 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RequestMapping("/api/employees")
 public class ApplicationController {
 
-	private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
 
-	@Resource
-	private EmployeeService employeeService;
+    @Resource
+    private EmployeeService employeeService;
 
-	@Operation(summary = "Get all employees", description = "Fetches all employees from the database")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "Successfully fetched the list of employees") })
-	@GetMapping
-	public ResponseEntity<List<Employee>> getAllEmployees() {
-		logger.info("Fetching all employees");
-		List<Employee> employees = employeeService.findAll();
-		return ResponseEntity.ok(employees);
-	}
+    @Operation(summary = "Get all employees", description = "Fetches all employees from the database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully fetched the list of employees") })
+    @GetMapping
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        logger.info("Fetching all employees");
 
-	@Operation(summary = "Insert a new employee", description = "Adds a new employee to the database")
-	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Employee successfully created") })
-	@PostMapping
-	public ResponseEntity<Employee> insertEmployee(@Valid @RequestBody Employee employee) {
-		logger.info("Inserting a new employee: {}", employee.getName());
-		Employee insertedEmployee = employeeService.insertEmployee(employee);
-		return ResponseEntity.status(201).body(insertedEmployee);
-	}
+        List<Employee> employees = Optional.ofNullable(employeeService.findAll())
+                .orElseThrow(() -> new RuntimeException("No employees found"));
 
-	@Operation(summary = "Update an existing employee", description = "Updates the details of an existing employee")
-	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Employee successfully updated"),
-			@ApiResponse(responseCode = "404", description = "Employee not found") })
-	@PutMapping("/{id}")
-	public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
-		logger.info("Updating employee with ID: {}", id);
-		employee.setId(id);
-		employeeService.updateEmployee(employee);
-		return ResponseEntity.noContent().build();
-	}
+        return ResponseEntity.ok(employees);
+    }
 
-	@Operation(summary = "Delete an employee", description = "Removes an employee from the database by ID")
-	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Employee successfully deleted"),
-			@ApiResponse(responseCode = "404", description = "Employee not found") })
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-		logger.info("Deleting employee with ID: {}", id);
-		boolean isDeleted = employeeService.deleteEmployee(id);
-		if (isDeleted) {
-			return ResponseEntity.noContent().build();
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
+    @Operation(summary = "Insert a new employee", description = "Adds a new employee to the database")
+    @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Employee successfully created") })
+    @PostMapping
+    public ResponseEntity<Employee> insertEmployee(@Valid @RequestBody Employee employee) {
+        // Correcting the logger to use string concatenation or placeholders
+        logger.info("Inserting a new employee: {}", employee.getName());
+
+        Employee insertedEmployee = employeeService.insertEmployee(employee);
+        return ResponseEntity.status(201).body(insertedEmployee);
+    }
+
+    @Operation(summary = "Update an existing employee", description = "Updates the details of an existing employee")
+    @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Employee successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Employee not found") })
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
+        logger.info("Updating employee with ID: {}", id);
+
+        employee.setId(id);
+
+        Optional.ofNullable(employeeService.updateEmployee(employee))
+                .orElseThrow(() -> new RuntimeException("Failed to update employee"));
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Delete an employee", description = "Removes an employee from the database by ID")
+    @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Employee successfully deleted"),
+            @ApiResponse(responseCode = "404", description = "Employee not found") })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        logger.info("Deleting employee with ID: {}", id);
+
+        boolean isDeleted = Optional.ofNullable(employeeService.deleteEmployee(id))
+                .orElse(false);
+
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

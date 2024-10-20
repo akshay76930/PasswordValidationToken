@@ -15,6 +15,15 @@ public interface EmployeeDao {
 
     boolean deleteEmployee(Long employeeId);
 
-	Optional<Employee> findById(Long id);
+    Optional<Employee> findById(Long id);
 
+    // Default method to check if an employee exists by ID, leveraging Java 8 Optional.
+    default boolean employeeExists(Long id) {
+        return findById(id).isPresent();
+    }
+
+    // Static method to provide common utility for DAOs if necessary.
+    static String normalizeName(String name) {
+        return name == null ? "" : name.trim().toUpperCase();
+    }
 }

@@ -7,19 +7,23 @@ import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
 
 public interface EmployeeService {
 
-    // Method to fetch all employees
     List<Employee> findAll();
 
-    // Method to insert a new employee
     Employee insertEmployee(Employee employee);
 
-    // Method to update an existing employee
     Employee updateEmployee(Employee employee);
 
-    // Method to delete an employee by ID
     boolean deleteEmployee(Long employeeId);
 
-    // Method to find an employee by ID
     Optional<Employee> findById(Long id);
 
+    // Default method to check if an employee exists by ID
+    default boolean employeeExists(Long id) {
+        return findById(id).isPresent();
+    }
+
+    // Static method for common utility, e.g., validating employee data
+    static boolean isValidEmployee(Employee employee) {
+        return employee != null && employee.getName() != null && !employee.getName().isEmpty();
+    }
 }

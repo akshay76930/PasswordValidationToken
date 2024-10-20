@@ -40,13 +40,15 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
     @Override
     public boolean insertEmployee(Employee employee) {
-        final String sql = "INSERT INTO employee (name, contact, gender, email , password) VALUES (:name, :contact, :gender, :email , :password)";
+        final String sql = "INSERT INTO employee (name, contact, gender, email, password) " +
+                "VALUES (:name, :contact, :gender, :email, :password)";
+        
         SqlParameterSource param = new MapSqlParameterSource()
                 .addValue("name", employee.getName())
                 .addValue("contact", employee.getContact())
                 .addValue("gender", employee.getGender())
                 .addValue("email", employee.getEmail())
-                .addValue("password" ,employee.getPassword());
+                .addValue("password", employee.getPassword());
         
         KeyHolder holder = new GeneratedKeyHolder();
         int rowsAffected = template.update(sql, param, holder);
@@ -57,7 +59,8 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
     @Override
     public boolean updateEmployee(Employee employee) {
-        final String sql = "UPDATE employee SET name = :name, email = :email, contact = :contact, gender = :gender WHERE id = :id";
+        final String sql = "UPDATE employee SET name = :name, email = :email, contact = :contact, gender = :gender " +
+                "WHERE id = :id";
 
         SqlParameterSource param = new MapSqlParameterSource()
                 .addValue("id", employee.getId())
@@ -90,6 +93,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
         params.put("id", id);
 
         List<Employee> employees = template.query(sql, params, new EmployeeMapper());
-        return employees.isEmpty() ? Optional.empty() : Optional.of(employees.get(0));
+        // Refactor with Java 8 Optional and Stream
+        return employees.stream().findFirst();
     }
 }
