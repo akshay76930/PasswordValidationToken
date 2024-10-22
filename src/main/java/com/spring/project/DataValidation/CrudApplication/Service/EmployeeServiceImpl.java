@@ -7,11 +7,14 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.project.DataValidation.CrudApplication.Dao.EmployeeDao;
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
+import com.spring.project.DataValidation.CrudApplication.Service.Repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -20,6 +23,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Resource
     private final EmployeeDao employeeDao;
+    
+    @Resource
+    private EmployeeRepository employeeRepository;
 
    
     public EmployeeServiceImpl(EmployeeDao employeeDao) {
@@ -91,4 +97,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("Fetching employee with ID: {}", id);
         return employeeDao.findById(id);
     }
+    public List<Employee> searchEmployees(String name, String gender) {
+        // Perform dynamic filtering based on name and gender
+        if (name != null && gender != null) {
+            return employeeRepository.findByNameAndGender(name, gender);
+        } else if (name != null) {
+            return employeeRepository.findByName(name);
+        } else if (gender != null) {
+            return employeeRepository.findByGender(gender);
+        } else {
+            return employeeRepository.findAll();
+        }
+    }
+
+	public Page<Employee> findAllWithPagination(PageRequest pageRequest) {
+        return employeeRepository.findAll(pageRequest);
+    }
+    
 }

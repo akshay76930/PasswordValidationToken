@@ -28,4 +28,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     // Custom query method to count employees by gender
     @Query("SELECT COUNT(e) FROM Employee e WHERE e.gender = :gender")
     long countByGender(@Param("gender") String gender);
+    
+    List<Employee> findByName(String name);
+    
+    List<Employee> findByNameAndGender(String name, String gender);
 }

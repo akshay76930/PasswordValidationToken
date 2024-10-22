@@ -8,6 +8,9 @@ import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
@@ -26,7 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
-@RequestMapping("/api/employees")
+@RequestMapping("/api/v1/employees")
 public class ApplicationController {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
@@ -40,10 +44,8 @@ public class ApplicationController {
     @GetMapping
     public ResponseEntity<List<Employee>> getAllEmployees() {
         logger.info("Fetching all employees");
-
         List<Employee> employees = Optional.ofNullable(employeeService.findAll())
                 .orElseThrow(() -> new RuntimeException("No employees found"));
-
         return ResponseEntity.ok(employees);
     }
 
@@ -54,22 +56,16 @@ public class ApplicationController {
     @GetMapping("/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
         logger.info("Fetching employee with ID: {}", id);
-
-        // Retrieve the employee using the service and handle Optional
         Employee employee = employeeService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
-
         return ResponseEntity.ok(employee);
     }
-    
-    
+
     @Operation(summary = "Insert a new employee", description = "Adds a new employee to the database")
     @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Employee successfully created") })
     @PostMapping
     public ResponseEntity<Employee> insertEmployee(@Valid @RequestBody Employee employee) {
-        // Correcting the logger to use string concatenation or placeholders
         logger.info("Inserting a new employee: {}", employee.getName());
-
         Employee insertedEmployee = employeeService.insertEmployee(employee);
         return ResponseEntity.status(201).body(insertedEmployee);
     }
@@ -80,12 +76,9 @@ public class ApplicationController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
         logger.info("Updating employee with ID: {}", id);
-
         employee.setId(id);
-
         Optional.ofNullable(employeeService.updateEmployee(employee))
                 .orElseThrow(() -> new RuntimeException("Failed to update employee"));
-
         return ResponseEntity.noContent().build();
     }
 
@@ -95,14 +88,38 @@ public class ApplicationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         logger.info("Deleting employee with ID: {}", id);
-
-        boolean isDeleted = Optional.ofNullable(employeeService.deleteEmployee(id))
-                .orElse(false);
-
-        if (isDeleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        boolean isDeleted = employeeService.deleteEmployee(id);
+        return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Employee>> searchEmployees(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String gender) {
+
+        logger.info("Searching employees by name: {} and gender: {}", name, gender);
+
+        List<Employee> employees = employeeService.searchEmployees(name, gender);
+
+        if (employees.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(employees);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<Employee>> getEmployeesWithPagination(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        logger.info("Fetching employees page: {} size: {} sorted by: {}", page, size, sortBy);
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<Employee> employees = employeeService.findAllWithPagination(pageRequest);
+
+        return ResponseEntity.ok(employees);
+    }
+
 }

@@ -21,79 +21,71 @@ import com.spring.project.DataValidation.CrudApplication.Mapper.EmployeeMapper;
 @Repository
 public class EmployeeDaoImpl implements EmployeeDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmployeeDaoImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(EmployeeDaoImpl.class);
 
-    private final NamedParameterJdbcTemplate template;
-    private final JdbcTemplate jdbcTemplate;
+	private final NamedParameterJdbcTemplate template;
 
-    public EmployeeDaoImpl(NamedParameterJdbcTemplate template, JdbcTemplate jdbcTemplate) {
-        this.template = template;
-        this.jdbcTemplate = jdbcTemplate;
-    }
+	public EmployeeDaoImpl(NamedParameterJdbcTemplate template, JdbcTemplate jdbcTemplate) {
+		this.template = template;
+	}
 
-    @Override
-    public List<Employee> findAll() {
-        final String sql = "SELECT * FROM employee";
-        logger.info("Executing query: {}", sql);
-        return template.query(sql, new EmployeeMapper());
-    }
+	@Override
+	public List<Employee> findAll() {
+		final String sql = "SELECT * FROM employee";
+		logger.info("Executing query: {}", sql);
+		return template.query(sql, new EmployeeMapper());
+	}
 
-    @Override
-    public boolean insertEmployee(Employee employee) {
-        final String sql = "INSERT INTO employee (name, contact, gender, email, password) " +
-                "VALUES (:name, :contact, :gender, :email, :password)";
-        
-        SqlParameterSource param = new MapSqlParameterSource()
-                .addValue("name", employee.getName())
-                .addValue("contact", employee.getContact())
-                .addValue("gender", employee.getGender())
-                .addValue("email", employee.getEmail())
-                .addValue("password", employee.getPassword());
-        
-        KeyHolder holder = new GeneratedKeyHolder();
-        int rowsAffected = template.update(sql, param, holder);
+	@Override
+	public boolean insertEmployee(Employee employee) {
+		final String sql = "INSERT INTO employee (name, contact, gender, email, password) "
+				+ "VALUES (:name, :contact, :gender, :email, :password)";
 
-        logger.info("Inserted employee: {}, Rows affected: {}", employee.getName(), rowsAffected);
-        return rowsAffected > 0;
-    }
+		SqlParameterSource param = new MapSqlParameterSource().addValue("name", employee.getName())
+				.addValue("contact", employee.getContact()).addValue("gender", employee.getGender())
+				.addValue("email", employee.getEmail()).addValue("password", employee.getPassword());
 
-    @Override
-    public boolean updateEmployee(Employee employee) {
-        final String sql = "UPDATE employee SET name = :name, email = :email, contact = :contact, gender = :gender " +
-                "WHERE id = :id";
+		KeyHolder holder = new GeneratedKeyHolder();
+		int rowsAffected = template.update(sql, param, holder);
 
-        SqlParameterSource param = new MapSqlParameterSource()
-                .addValue("id", employee.getId())
-                .addValue("name", employee.getName())
-                .addValue("contact", employee.getContact())
-                .addValue("email", employee.getEmail())
-                .addValue("gender", employee.getGender());
+		logger.info("Inserted employee: {}, Rows affected: {}", employee.getName(), rowsAffected);
+		return rowsAffected > 0;
+	}
 
-        int rowsAffected = template.update(sql, param);
+	@Override
+	public boolean updateEmployee(Employee employee) {
+		final String sql = "UPDATE employee SET name = :name, email = :email, contact = :contact, gender = :gender "
+				+ "WHERE id = :id";
 
-        logger.info("Updated employee with ID: {}, Rows affected: {}", employee.getId(), rowsAffected);
-        return rowsAffected > 0;
-    }
+		SqlParameterSource param = new MapSqlParameterSource().addValue("id", employee.getId())
+				.addValue("name", employee.getName()).addValue("contact", employee.getContact())
+				.addValue("email", employee.getEmail()).addValue("gender", employee.getGender());
 
-    @Override
-    public boolean deleteEmployee(Long employeeId) {
-        final String sql = "DELETE FROM employee WHERE id = :id";
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", employeeId);
+		int rowsAffected = template.update(sql, param);
 
-        int rowsAffected = template.update(sql, params);
-        logger.info("Deleted employee with ID: {}, Rows affected: {}", employeeId, rowsAffected);
-        return rowsAffected > 0;
-    }
+		logger.info("Updated employee with ID: {}, Rows affected: {}", employee.getId(), rowsAffected);
+		return rowsAffected > 0;
+	}
 
-    @Override
-    public Optional<Employee> findById(Long id) {
-        final String sql = "SELECT * FROM employee WHERE id = :id";
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", id);
+	@Override
+	public boolean deleteEmployee(Long employeeId) {
+		final String sql = "DELETE FROM employee WHERE id = :id";
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", employeeId);
 
-        List<Employee> employees = template.query(sql, params, new EmployeeMapper());
-        // Refactor with Java 8 Optional and Stream
-        return employees.stream().findFirst();
-    }
+		int rowsAffected = template.update(sql, params);
+		logger.info("Deleted employee with ID: {}, Rows affected: {}", employeeId, rowsAffected);
+		return rowsAffected > 0;
+	}
+
+	@Override
+	public Optional<Employee> findById(Long id) {
+		final String sql = "SELECT * FROM employee WHERE id = :id";
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", id);
+
+		List<Employee> employees = template.query(sql, params, new EmployeeMapper());
+		// Refactor with Java 8 Optional and Stream
+		return employees.stream().findFirst();
+	}
 }
