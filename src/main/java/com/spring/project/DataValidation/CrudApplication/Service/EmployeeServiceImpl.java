@@ -8,12 +8,9 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-<<<<<<< HEAD
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-=======
-import org.springframework.beans.factory.annotation.Autowired;
->>>>>>> 3af1341002cd0c99aa0cb58c6e687ff7e52a79a8
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +27,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-    
-    
+
     @Resource
     private final EmployeeDao employeeDao;
-    
-    @Resource
-    private EmployeeRepository employeeRepository;
 
-   
+    // Constructor for injecting EmployeeDao
     public EmployeeServiceImpl(EmployeeDao employeeDao) {
         this.employeeDao = employeeDao;
     }
@@ -59,7 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .filter(p -> !p.isEmpty() && isValidPassword(p))
                 .orElseGet(() -> {
                     logger.warn("Invalid or no password provided, assigning default password");
-                    return DEFAULT_PASSWORD; 
+                    return DEFAULT_PASSWORD;
                 });
 
         employee.setPassword(password);
@@ -100,7 +93,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         } catch (Exception e) {
             logger.error("Failed to delete employee with ID: {}", employeeId, e);
-            return false; 
+            return false;
         }
     }
 
@@ -109,7 +102,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("Fetching employee with ID: {}", id);
         return employeeDao.findById(id);
     }
-<<<<<<< HEAD
+
+    @Override
     public List<Employee> searchEmployees(String name, String gender) {
         // Perform dynamic filtering based on name and gender
         if (name != null && gender != null) {
@@ -123,13 +117,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
     }
 
-	public Page<Employee> findAllWithPagination(PageRequest pageRequest) {
+    @Override
+    public Page<Employee> findAllWithPagination(PageRequest pageRequest) {
         return employeeRepository.findAll(pageRequest);
-=======
-    
+    }
+
     private boolean isValidPassword(String password) {
         return PASSWORD_PATTERN.matcher(password).matches();
->>>>>>> 3af1341002cd0c99aa0cb58c6e687ff7e52a79a8
     }
-    
 }
