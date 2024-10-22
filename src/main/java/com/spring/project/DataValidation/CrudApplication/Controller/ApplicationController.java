@@ -101,7 +101,7 @@ public class ApplicationController {
 
         if (isDeleted) {
             return ResponseEntity.noContent().build();
-        } else {
+        } else { 
             return ResponseEntity.notFound().build();
         }
     }

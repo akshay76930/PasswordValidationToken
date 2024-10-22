@@ -2,22 +2,31 @@ package com.spring.project.DataValidation.CrudApplication.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.project.DataValidation.CrudApplication.Dao.EmployeeDao;
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
+import com.spring.project.DataValidation.CrudApplication.Service.Repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+    private static final String DEFAULT_PASSWORD = "SecureDefaultPassword123!";
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])(?=.{8,})");
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    
+    
     @Resource
     private final EmployeeDao employeeDao;
 
@@ -36,21 +45,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public Employee insertEmployee(Employee employee) {
         logger.info("Inserting a new employee: {}", employee.getName());
-        String password = Optional.ofNullable(employee.getPassword()).filter(p -> !p.isEmpty())
+
+        // Validate the provided password
+        String password = Optional.ofNullable(employee.getPassword())
+                .filter(p -> !p.isEmpty() && isValidPassword(p))
                 .orElseGet(() -> {
-                    logger.warn("No password provided, assigning default password");
-                    return "defaultpassword"; 
+                    logger.warn("Invalid or no password provided, assigning default password");
+                    return DEFAULT_PASSWORD; 
                 });
+
         employee.setPassword(password);
 
-        try {
-            employeeDao.insertEmployee(employee);
-            logger.info("Successfully inserted employee with ID: {}", employee.getId());
-            return employee;
-        } catch (Exception e) {
-            logger.error("Error inserting employee: {}", e.getMessage());
-            throw new RuntimeException("Failed to insert employee", e);
+        // Check for existing employee with the same email
+        if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
+            throw new RuntimeException("Email address already in use");
         }
+        return employeeRepository.save(employee);
     }
 
     @Override
@@ -91,4 +101,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("Fetching employee with ID: {}", id);
         return employeeDao.findById(id);
     }
+    
+    private boolean isValidPassword(String password) {
+        return PASSWORD_PATTERN.matcher(password).matches();
+    }
+    
 }
