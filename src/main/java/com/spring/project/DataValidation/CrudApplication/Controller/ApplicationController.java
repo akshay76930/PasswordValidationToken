@@ -88,8 +88,20 @@ public class ApplicationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         logger.info("Deleting employee with ID: {}", id);
+<<<<<<< HEAD
         boolean isDeleted = employeeService.deleteEmployee(id);
         return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+=======
+
+        boolean isDeleted = Optional.ofNullable(employeeService.deleteEmployee(id))
+                .orElse(false);
+
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else { 
+            return ResponseEntity.notFound().build();
+        }
+>>>>>>> 3af1341002cd0c99aa0cb58c6e687ff7e52a79a8
     }
 
     @GetMapping("/search")

@@ -2,13 +2,18 @@ package com.spring.project.DataValidation.CrudApplication.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+<<<<<<< HEAD
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+=======
+import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> 3af1341002cd0c99aa0cb58c6e687ff7e52a79a8
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +25,13 @@ import com.spring.project.DataValidation.CrudApplication.Service.Repository.Empl
 public class EmployeeServiceImpl implements EmployeeService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+    private static final String DEFAULT_PASSWORD = "SecureDefaultPassword123!";
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])(?=.{8,})");
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    
+    
     @Resource
     private final EmployeeDao employeeDao;
     
@@ -42,21 +53,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public Employee insertEmployee(Employee employee) {
         logger.info("Inserting a new employee: {}", employee.getName());
-        String password = Optional.ofNullable(employee.getPassword()).filter(p -> !p.isEmpty())
+
+        // Validate the provided password
+        String password = Optional.ofNullable(employee.getPassword())
+                .filter(p -> !p.isEmpty() && isValidPassword(p))
                 .orElseGet(() -> {
-                    logger.warn("No password provided, assigning default password");
-                    return "defaultpassword"; 
+                    logger.warn("Invalid or no password provided, assigning default password");
+                    return DEFAULT_PASSWORD; 
                 });
+
         employee.setPassword(password);
 
-        try {
-            employeeDao.insertEmployee(employee);
-            logger.info("Successfully inserted employee with ID: {}", employee.getId());
-            return employee;
-        } catch (Exception e) {
-            logger.error("Error inserting employee: {}", e.getMessage());
-            throw new RuntimeException("Failed to insert employee", e);
+        // Check for existing employee with the same email
+        if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
+            throw new RuntimeException("Email address already in use");
         }
+        return employeeRepository.save(employee);
     }
 
     @Override
@@ -97,6 +109,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("Fetching employee with ID: {}", id);
         return employeeDao.findById(id);
     }
+<<<<<<< HEAD
     public List<Employee> searchEmployees(String name, String gender) {
         // Perform dynamic filtering based on name and gender
         if (name != null && gender != null) {
@@ -112,6 +125,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	public Page<Employee> findAllWithPagination(PageRequest pageRequest) {
         return employeeRepository.findAll(pageRequest);
+=======
+    
+    private boolean isValidPassword(String password) {
+        return PASSWORD_PATTERN.matcher(password).matches();
+>>>>>>> 3af1341002cd0c99aa0cb58c6e687ff7e52a79a8
     }
     
 }
