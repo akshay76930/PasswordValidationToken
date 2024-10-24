@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.project.DataValidation.CrudApplication.Dao.EmployeeDao;
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
-import com.spring.project.DataValidation.CrudApplication.Service.Repository.EmployeeRepository;
+import com.spring.project.DataValidation.CrudApplication.Repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {

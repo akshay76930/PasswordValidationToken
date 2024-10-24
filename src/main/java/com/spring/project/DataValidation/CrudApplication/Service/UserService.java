@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.spring.project.DataValidation.CrudApplication.Entity.PasswordResetToken;
 import com.spring.project.DataValidation.CrudApplication.Entity.User;
-import com.spring.project.DataValidation.CrudApplication.Service.Repository.PasswordResetTokenRepository;
-import com.spring.project.DataValidation.CrudApplication.Service.Repository.UserRepository;
+import com.spring.project.DataValidation.CrudApplication.Repository.PasswordResetTokenRepository;
+import com.spring.project.DataValidation.CrudApplication.Repository.UserRepository;
 
 @Service
 public class UserService {

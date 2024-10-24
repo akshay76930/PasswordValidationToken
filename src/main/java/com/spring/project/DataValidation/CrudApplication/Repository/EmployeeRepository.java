@@ -1,4 +1,4 @@
-package com.spring.project.DataValidation.CrudApplication.Service.Repository;
+package com.spring.project.DataValidation.CrudApplication.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
