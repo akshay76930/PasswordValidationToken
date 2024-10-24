@@ -15,7 +15,7 @@ public class UserController {
 
     @Autowired	
     private UserService userService;
-
+    
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {
         userService.sendPasswordResetEmail(email);
