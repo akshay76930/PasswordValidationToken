@@ -1,14 +1,10 @@
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
-
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "employee")
@@ -20,23 +16,42 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false) // Name cannot be null
     private String name;
+
     private String contact;
+
     private String gender;
+
+    @Column(nullable = false, unique = true) // Email must be unique and cannot be null
     private String email;
+
+    @Column(nullable = false) // Password cannot be null
     private String password;
 
+    @Column(nullable = false) // Expiration date cannot be null
+    private LocalDateTime expirationDate;
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many Employees can relate to one User
+    @JoinColumn(name = "user_id", nullable = false) // Foreign key for the User entity
+    private User user; // Reference to User entity
+
+    // Default constructor
     public Employee() {}
 
-    public Employee(Long id, String name, String contact, String gender, String email, String password) {
+    // Constructor with parameters
+    public Employee(Long id, String name, String contact, String gender, String email, String password, LocalDateTime expirationDate, User user) {
         this.id = id;
         this.name = name;
         this.contact = contact;
         this.gender = gender;
         this.email = email;
         this.password = password;
+        this.expirationDate = expirationDate;
+        this.user = user; // Initialize User reference
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -85,9 +100,25 @@ public class Employee implements Serializable {
         this.password = password;
     }
 
+    public LocalDateTime getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public User getUser() {
+        return user; // Getter for User reference
+    }
+
+    public void setUser(User user) {
+        this.user = user; // Setter for User reference
+    }
+
     @Override
     public String toString() {
-        return "Employee [id=" + id + ", name=" + name + ", contact=" + contact + ", gender=" + gender + ", email=" + email + ", password=" + password + "]";
+        return "Employee [id=" + id + ", name=" + name + ", contact=" + contact + ", gender=" + gender + ", email=" + email + "]";
     }
 
     @Override

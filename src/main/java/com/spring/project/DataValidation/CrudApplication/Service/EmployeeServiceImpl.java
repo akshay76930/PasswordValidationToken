@@ -9,6 +9,8 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,12 +27,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-    
-    
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
     @Resource
     private final EmployeeDao employeeDao;
+    
+    @Autowired
+    private EmailNotificationService emailNotificationService;
 
-   
     public EmployeeServiceImpl(EmployeeDao employeeDao) {
         this.employeeDao = employeeDao;
     }
@@ -47,11 +53,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("Inserting a new employee: {}", employee.getName());
 
         // Validate the provided password
-        String password = Optional.ofNullable(employee.getPassword())
-                .filter(p -> !p.isEmpty() && isValidPassword(p))
+        String password = Optional.ofNullable(employee.getPassword()).filter(p -> !p.isEmpty() && isValidPassword(p))
                 .orElseGet(() -> {
                     logger.warn("Invalid or no password provided, assigning default password");
-                    return DEFAULT_PASSWORD; 
+                    return DEFAULT_PASSWORD;
                 });
 
         employee.setPassword(password);
@@ -60,6 +65,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
             throw new RuntimeException("Email address already in use");
         }
+
         return employeeRepository.save(employee);
     }
 
@@ -92,7 +98,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         } catch (Exception e) {
             logger.error("Failed to delete employee with ID: {}", employeeId, e);
-            return false; 
+            return false;
         }
     }
 
@@ -101,9 +107,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("Fetching employee with ID: {}", id);
         return employeeDao.findById(id);
     }
-    
+
     private boolean isValidPassword(String password) {
         return PASSWORD_PATTERN.matcher(password).matches();
     }
-    
+
 }
