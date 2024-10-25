@@ -3,30 +3,19 @@ package com.spring.project.DataValidation.CrudApplication.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeHttpRequests(authorize -> authorize
-                .antMatchers("/api/forgot-password", "/api/reset-password").permitAll() // Public endpoints
-                .anyRequest().authenticated() // Secure all other endpoints
-            )
-            .formLogin(form -> form
-                .loginPage("/login") // Custom login page (optional)
-                .permitAll() // Allow everyone to see the login page
-                .defaultSuccessUrl("/home", true) // Redirect after successful login
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout") // Customize the logout URL
-                .logoutSuccessUrl("/login?logout") // Redirect to login with a logout message
-                .permitAll()
-            );
-
-        return http.build();
+            .csrf().disable() // Disable CSRF for simplicity in this example
+            .authorizeRequests()
+            .antMatchers("/api/forgot-password", "/api/reset-password").permitAll() // Allow access to these endpoints
+            .anyRequest().authenticated() // All other requests require authentication
+            .and()
+            .httpBasic(); // Enable basic authentication
     }
 }

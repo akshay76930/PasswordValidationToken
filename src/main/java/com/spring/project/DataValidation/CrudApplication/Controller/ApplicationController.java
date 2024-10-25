@@ -11,7 +11,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
 import com.spring.project.DataValidation.CrudApplication.Service.EmailNotificationService;
@@ -40,12 +48,9 @@ public class ApplicationController {
 			@ApiResponse(responseCode = "200", description = "Successfully fetched the list of employees") })
 	@GetMapping
 	public ResponseEntity<List<Employee>> getAllEmployees() {
-		logger.info("Request received: Fetching all employees");
-		List<Employee> employees = Optional.ofNullable(employeeService.findAll()).orElseThrow(() -> {
-			logger.warn("No employees found in the database");
-			return new RuntimeException("No employees found");
-		});
-		logger.info("Fetched {} employees", employees.size());
+		logger.info("Fetching all employees");
+		List<Employee> employees = Optional.ofNullable(employeeService.findAll())
+				.orElseThrow(() -> new RuntimeException("No employees found"));
 		return ResponseEntity.ok(employees);
 	}
 
@@ -54,12 +59,9 @@ public class ApplicationController {
 			@ApiResponse(responseCode = "404", description = "Employee not found") })
 	@GetMapping("/{id}")
 	public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-		logger.info("Request received: Fetching employee with ID: {}", id);
-		Employee employee = employeeService.findById(id).orElseThrow(() -> {
-			logger.error("Employee with ID {} not found.", id);
-			return new RuntimeException("Employee not found");
-		});
-		logger.info("Found employee: {}", employee);
+		logger.info("Fetching employee with ID: {}", id);
+		Employee employee = employeeService.findById(id)
+				.orElseThrow(() -> new RuntimeException("Employee not found"));
 		return ResponseEntity.ok(employee);
 	}
 
@@ -67,9 +69,8 @@ public class ApplicationController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Employee successfully created") })
 	@PostMapping
 	public ResponseEntity<Employee> insertEmployee(@Valid @RequestBody Employee employee) {
-		logger.info("Request received: Inserting a new employee with name: {}", employee.getName());
+		logger.info("Inserting a new employee: {}", employee.getName());
 		Employee insertedEmployee = employeeService.insertEmployee(employee);
-		logger.info("Employee inserted successfully with ID: {}", insertedEmployee.getId());
 		return ResponseEntity.status(201).body(insertedEmployee);
 	}
 
@@ -78,13 +79,10 @@ public class ApplicationController {
 			@ApiResponse(responseCode = "404", description = "Employee not found") })
 	@PutMapping("/{id}")
 	public ResponseEntity<Void> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
-		logger.info("Request received: Updating employee with ID: {}", id);
+		logger.info("Updating employee with ID: {}", id);
 		employee.setId(id);
-		Optional.ofNullable(employeeService.updateEmployee(employee)).orElseThrow(() -> {
-			logger.error("Failed to update employee with ID: {}", id);
-			return new RuntimeException("Failed to update employee");
-		});
-		logger.info("Employee with ID: {} updated successfully", id);
+		Optional.ofNullable(employeeService.updateEmployee(employee))
+				.orElseThrow(() -> new RuntimeException("Failed to update employee"));
 		return ResponseEntity.noContent().build();
 	}
 
@@ -93,28 +91,20 @@ public class ApplicationController {
 			@ApiResponse(responseCode = "404", description = "Employee not found") })
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
-		logger.info("Request received: Deleting employee with ID: {}", id);
+		logger.info("Deleting employee with ID: {}", id);
 		boolean isDeleted = employeeService.deleteEmployee(id);
-		if (isDeleted) {
-			logger.info("Employee with ID: {} deleted successfully", id);
-			return ResponseEntity.noContent().build();
-		} else {
-			logger.warn("Employee with ID: {} not found for deletion", id);
-			return ResponseEntity.notFound().build();
-		}
+		return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
 	}
 
 	@Operation(summary = "Search employees", description = "Search employees by name and/or gender")
 	@GetMapping("/search")
 	public ResponseEntity<List<Employee>> searchEmployees(@RequestParam(required = false) String name,
 			@RequestParam(required = false) String gender) {
-		logger.info("Request received: Searching employees by name: {} and gender: {}", name, gender);
+		logger.info("Searching employees by name: {} and gender: {}", name, gender);
 		List<Employee> employees = employeeService.searchEmployees(name, gender);
 		if (employees.isEmpty()) {
-			logger.warn("No employees found matching criteria - name: {} gender: {}", name, gender);
 			return ResponseEntity.noContent().build();
 		}
-		logger.info("Found {} employees matching search criteria", employees.size());
 		return ResponseEntity.ok(employees);
 	}
 
@@ -122,10 +112,9 @@ public class ApplicationController {
 	@GetMapping("/page")
 	public ResponseEntity<Page<Employee>> getEmployeesWithPagination(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy) {
-		logger.info("Request received: Fetching employees page: {} size: {} sorted by: {}", page, size, sortBy);
+		logger.info("Fetching employees page: {} size: {} sorted by: {}", page, size, sortBy);
 		PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
 		Page<Employee> employees = employeeService.findAllWithPagination(pageRequest);
-		logger.info("Fetched page {} of employees with page size {}", page, size);
 		return ResponseEntity.ok(employees);
 	}
 
@@ -135,14 +124,7 @@ public class ApplicationController {
 			@ApiResponse(responseCode = "400", description = "Invalid email data"),
 			@ApiResponse(responseCode = "500", description = "Internal server error while sending email") })
 	public ResponseEntity<String> sendEmail(@RequestParam String to, @RequestParam String subject) {
-		logger.info("Request received: Sending email to: {}", to);
-		try {
-			emailNotificationService.sendEmailWithTemplate(to, subject);
-			logger.info("Email sent successfully to {}", to);
-			return ResponseEntity.ok("Email sent successfully to " + to);
-		} catch (Exception e) {
-			logger.error("Failed to send email to {} with subject {}: {}", to, subject, e.getMessage());
-			return ResponseEntity.status(500).body("Failed to send email");
-		}
+		emailNotificationService.sendEmailWithTemplate(to, subject);
+		return ResponseEntity.ok("Email sent successfully to " + to);
 	}
 }
