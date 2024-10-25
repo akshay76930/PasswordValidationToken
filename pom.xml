@@ -18,7 +18,10 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>1.8</java.version> <!-- Java 8 -->
+		<java.version>1.8</java.version> <!-- Java 8 Compatibility -->
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
@@ -38,15 +41,15 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.5.12</version> <!-- Compatible with Java 8 -->
+			<version>1.5.12</version> <!-- Version is okay -->
 		</dependency>
 
 		<!-- Hibernate Validator for Bean Validation -->
 		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>6.0.24.Final</version> <!-- Compatible with Java 8 -->
-		</dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>6.0.22.Final</version>
+</dependency>
 
 		<!-- Jakarta Annotation API for @Resource and @Valid annotations -->
 		<dependency>
@@ -79,7 +82,7 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
-			<version>0.9.1</version>
+			<version>0.9.1</version> <!-- Version compatible with Java 8 -->
 		</dependency>
 
 		<!-- Spring Boot OAuth2 Client -->
@@ -113,7 +116,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.30</version> <!-- Updated version for Java 8 -->
+			<version>1.7.30</version> <!-- Compatible version for Java 8 -->
 		</dependency>
 
 		<!-- Thymeleaf for templating -->

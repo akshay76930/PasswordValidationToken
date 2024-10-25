@@ -9,7 +9,7 @@ public interface EmployeeDao {
 
 	List<Employee> findAll();
 
-	boolean insertEmployee(Employee employee);
+	Employee insertEmployee(Employee employee);
 
 	boolean updateEmployee(Employee employee);
 
