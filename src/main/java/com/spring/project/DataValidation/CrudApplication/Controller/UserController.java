@@ -16,11 +16,11 @@ public class UserController {
     @Autowired	
     private UserService userService;
     
-    @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-        userService.sendPasswordResetEmail(email);
-        return ResponseEntity.ok("Password reset email sent.");
-    }
+//    @PostMapping("/forgot-password")
+//    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+//        userService.sendPasswordResetEmail(email);
+//        return ResponseEntity.ok("Password reset email sent.");
+//    }
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {

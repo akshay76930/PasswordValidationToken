@@ -1,37 +1,32 @@
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "auth_request") // Custom table name
+public class AuthRequest {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Use IDENTITY strategy for auto-increment
     private Long id;
 
     private String username;
     private String password;
-    private String email;  // Ensure this field exists
-    @Column(name = "token")
-    private String token;
 
-    public String getToken() {
-		return token;
-	}
+    // Default constructor
+    public AuthRequest() {}
 
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	// Constructors, getters, and setters
-    public User() {}
-
-    public User(String username, String password, String email) {
+    // Parameterized constructor
+    public AuthRequest(String username, String password) {
         this.username = username;
         this.password = password;
-        this.email = email;
     }
 
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -54,13 +49,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

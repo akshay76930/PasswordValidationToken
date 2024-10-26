@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.spring.project.DataValidation.CrudApplication.Dao.EmployeeDao;
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
 import com.spring.project.DataValidation.CrudApplication.Repository.EmployeeRepository;
+import com.spring.project.DataValidation.CrudApplication.Service.EmployeeService;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -29,7 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Autowired
 	private EmployeeRepository employeeRepository;
 
-	@Resource
+	@Autowired
 	private final EmployeeDao employeeDao;
 
 	// Constructor for injecting EmployeeDao
