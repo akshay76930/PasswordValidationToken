@@ -12,7 +12,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-	private static final String SECRET_KEY = "N7uvTazDNIAPhiq9YWoRNy28ktMDwz0nnE+qkOA//7akdVTGGn/qcpNF1Jm9Q+wn0tODtjkE5sabv1Jduxs0Hw==";
+	private static final String SECRET_KEY = "1fDZFm6JPf9znRSbdNjLwMoeWyaWpE9Tz2xgYO9i2ow=";
 	private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
 
 	private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

@@ -19,6 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers("/api/v1/employees/all").permitAll() // Allow unauthenticated access to the "Get all employees" endpoint
                 .antMatchers("/api/v1/auth/login").permitAll() // Allow login endpoint without authentication
+                .antMatchers("/api/v1/auth/test-token").permitAll()
                 .antMatchers("/api/v1/auth/register").permitAll() // Allow login endpoint without authentication
                 .antMatchers("/api/v1/employees/search").permitAll() // Allow unauthenticated access to the "Search employees" endpoint
                 .antMatchers("/api/forgot-password", "/api/reset-password").permitAll() ////Allow access to password reset functionalities without requiring authentication.

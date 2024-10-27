@@ -24,41 +24,53 @@ import com.spring.project.DataValidation.CrudApplication.Service.AuthRequestServ
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final AuthRequestService authRequestService;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final PasswordEncoder passwordEncoder; // Add this line
+	private final AuthRequestService authRequestService;
+	private final UserRepository userRepository;
+	private final JwtUtil jwtUtil;
+	private final PasswordEncoder passwordEncoder; // Add this line
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class); // Logger initialization
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class); // Logger initialization
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
+	@Value("${jwt.expiration}")
+	private long jwtExpiration;
 
-    @Autowired
-    public AuthController(AuthRequestService authRequestService, UserRepository userRepository,
-                          JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
-        this.authRequestService = authRequestService;
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-        this.passwordEncoder = passwordEncoder; // Inject PasswordEncoder
-    }
+	@Autowired
+	public AuthController(AuthRequestService authRequestService, UserRepository userRepository, JwtUtil jwtUtil,
+			PasswordEncoder passwordEncoder) {
+		this.authRequestService = authRequestService;
+		this.userRepository = userRepository;
+		this.jwtUtil = jwtUtil;
+		this.passwordEncoder = passwordEncoder; // Inject PasswordEncoder
+	}
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthRequest> register(@RequestBody AuthRequest authRequest) {
-        // Assuming you have some logic in your service to handle registration
-        AuthRequest savedAuthRequest = authRequestService.saveAuthRequest(authRequest);
-        return ResponseEntity.ok(savedAuthRequest);
-    }
+	@PostMapping("/login")
+	public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
+		logger.info("Login request received for user: {}", authRequest.getUsername());
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
-        Optional<User> userOpt = userRepository.findByUsername(authRequest.getUsername());
+		Optional<User> userOpt = userRepository.findByUsername(authRequest.getUsername());
 
-        if (userOpt.isPresent() && passwordEncoder.matches(authRequest.getPassword(), userOpt.get().getPassword())) {
-            String token = jwtUtil.generateToken(userOpt.get().getUsername());
-            return ResponseEntity.ok(token);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        }
-    }
+		if (userOpt.isPresent() && passwordEncoder.matches(authRequest.getPassword(), userOpt.get().getPassword())) {
+			String token = jwtUtil.generateToken(userOpt.get().getUsername());
+			logger.info("Login successful for user: {}", authRequest.getUsername());
+			return ResponseEntity.ok(token);
+		} else {
+			logger.warn("Login failed for user: {}", authRequest.getUsername());
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+		}
+	}
+	@PostMapping("/register")
+	public ResponseEntity<AuthRequest> register(@RequestBody AuthRequest authRequest) {
+	    authRequest.setPassword(passwordEncoder.encode(authRequest.getPassword()));
+	    AuthRequest savedAuthRequest = authRequestService.saveAuthRequest(authRequest);
+	    logger.info("User registered successfully: {}", authRequest.getUsername());
+	    return ResponseEntity.ok(savedAuthRequest);
+	}
+	
+	@PostMapping("/test-token")
+	public ResponseEntity<String> testToken() {
+	    String testUsername = "nisha";
+	    String token = jwtUtil.generateToken(testUsername);
+	    return ResponseEntity.ok(token);
+	}
+
 }
