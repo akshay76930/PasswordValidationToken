@@ -1,39 +1,18 @@
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
-/**
- * Entity class representing an authentication request.
- */
 @Entity
-@Table(name = "auth_request") // Custom table name
 public class AuthRequest {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Use IDENTITY strategy for auto-increment
-    private Long id;
+    private Long id; // Assuming you have an ID field
 
-    @Column(nullable = false, unique = true, length = 50) // Ensure username is unique and not null
-    private String username;
+    private String username; // Ensure this field exists
+    private String password; // Ensure this field exists
+    private String token; // If this is needed as well
 
-    @Column(nullable = false) // Password should not be null
-    private String password;
-
-    // Default constructor
-    public AuthRequest() {}
-
-    // Parameterized constructor
-    public AuthRequest(String username, String password) {
-        this.username = username;
-        this.password = password; // Consider hashing this password before setting it
-    }
-
-    // Getters and setters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -55,27 +34,14 @@ public class AuthRequest {
     }
 
     public void setPassword(String password) {
-        this.password = password; // Consider hashing this password before setting it
+        this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "AuthRequest{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                '}';
+    public String getToken() {
+        return token;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AuthRequest)) return false;
-        AuthRequest that = (AuthRequest) o;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31; // Default hash code for the entity
+    public void setToken(String token) {
+        this.token = token;
     }
 }
