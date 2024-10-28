@@ -14,24 +14,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable() // Disable CSRF for simplicity; consider enabling it based on your requirements
+        http.csrf().disable()
             .authorizeRequests()
-                .antMatchers("/api/v1/employees/all").permitAll() // Allow unauthenticated access to the "Get all employees" endpoint
-                .antMatchers("/api/v1/auth/login").permitAll() // Allow login endpoint without authentication
-                .antMatchers("/api/v1/auth/test-token").permitAll()
-                .antMatchers("/api/v1/auth/register").permitAll() // Allow login endpoint without authentication
-                .antMatchers("/api/v1/employees/search").permitAll() // Allow unauthenticated access to the "Search employees" endpoint
-                .antMatchers("/api/forgot-password", "/api/reset-password").permitAll() ////Allow access to password reset functionalities without requiring authentication.
-                .antMatchers("/api/v1/employees/page").permitAll() // Allow unauthenticated access to paginated list
-                .antMatchers("/api/v1/employees/sendEmail").authenticated() // Restrict "Send email" to authenticated users
-                .antMatchers("/api/v1/employees/create").authenticated() // Restrict employee creation to authenticated users
-                
-                .antMatchers("/api/v1/employees/update/**").authenticated() // Restrict employee updates to authenticated users
-                .antMatchers("/api/v1/employees/delete/**").authenticated() // Restrict employee deletion to authenticated users
-                .anyRequest().authenticated() // Require authentication for all other requests
+                .antMatchers(
+                    "/api/v1/auth/login", 
+                    "/api/v1/auth/register", 
+                    "/api/v1/auth/test-token", 
+                    "/api/forgot-password", 
+                    "/api/reset-password", 
+                    "/api/v1/employees/all", 
+                    "/api/v1/employees/search", 
+                    "/api/v1/employees/page"
+                ).permitAll()
+                .antMatchers(
+                    "/api/v1/employees/sendEmail", 
+                    "/api/v1/employees/create", 
+                    "/api/v1/employees/update/**", 
+                    "/api/v1/employees/delete/**"
+                ).authenticated()
+                .anyRequest().authenticated()
             .and()
-            .httpBasic(); // Enable basic authentication; configure as needed
+            .httpBasic();
     }
     
     @Bean
@@ -39,12 +42,3 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 }
-
-
-
-
-
-
-
-
-

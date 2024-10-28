@@ -3,9 +3,11 @@ package com.spring.project.DataValidation.CrudApplication.Entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
 import javax.persistence.*;
 
+/**
+ * Entity class representing an employee.
+ */
 @Entity
 @Table(name = "employee")
 public class Employee implements Serializable {
@@ -16,14 +18,14 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false) // Name cannot be null
+    @Column(nullable = false, length = 100) // Name cannot be null and has a max length
     private String name;
 
     private String contact;
 
     private String gender;
 
-    @Column(nullable = false, unique = true) // Email must be unique and cannot be null
+    @Column(nullable = false, unique = true, length = 100) // Email must be unique and cannot be null
     private String email;
 
     @Column(nullable = false) // Password cannot be null
@@ -40,13 +42,12 @@ public class Employee implements Serializable {
     public Employee() {}
 
     // Constructor with parameters
-    public Employee(Long id, String name, String contact, String gender, String email, String password, LocalDateTime expirationDate, User user) {
-        this.id = id;
+    public Employee(String name, String contact, String gender, String email, String password, LocalDateTime expirationDate, User user) {
         this.name = name;
         this.contact = contact;
         this.gender = gender;
         this.email = email;
-        this.password = password;
+        this.password = password; // Consider hashing this password before setting it
         this.expirationDate = expirationDate;
         this.user = user; // Initialize User reference
     }
@@ -97,7 +98,7 @@ public class Employee implements Serializable {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password; // Consider hashing this password before setting it
     }
 
     public LocalDateTime getExpirationDate() {

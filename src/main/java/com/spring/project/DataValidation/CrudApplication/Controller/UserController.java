@@ -13,19 +13,23 @@ import com.spring.project.DataValidation.CrudApplication.Service.UserService;
 @RequestMapping("/api")
 public class UserController {
 
-    @Autowired	
-    private UserService userService;
-    
-//    @PostMapping("/forgot-password")
-//    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-//        userService.sendPasswordResetEmail(email);
-//        return ResponseEntity.ok("Password reset email sent.");
-//    }
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        userService.sendPasswordResetEmail(email);
+        return ResponseEntity.ok("Password reset email sent.");
+    }
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-        userService.resetPassword(token, newPassword);
-        return ResponseEntity.ok("Password has been reset.");
+        return userService.resetPassword(token, newPassword)
+            ? ResponseEntity.ok("Password has been reset.")
+            : ResponseEntity.badRequest().body("Failed to reset password.");
     }
 }
-

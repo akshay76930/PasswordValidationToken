@@ -17,7 +17,6 @@ import com.spring.project.DataValidation.CrudApplication.Repository.EmployeeRepo
 public class EmployeeDaoImpl implements EmployeeDao {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeDaoImpl.class);
-
     private final EmployeeRepository employeeRepository;
 
     @Autowired
@@ -39,26 +38,26 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
     @Override
     public boolean updateEmployee(@Valid Employee employee) {
-        if (employeeRepository.existsById(employee.getId())) {
+        boolean exists = employeeRepository.existsById(employee.getId());
+        if (exists) {
             logger.info("Updating employee: {}", employee.getId());
             employeeRepository.save(employee);
-            return true;
         } else {
             logger.warn("Employee with ID {} not found for update", employee.getId());
-            return false;
         }
+        return exists;
     }
 
     @Override
     public boolean deleteEmployee(Long employeeId) {
-        if (employeeRepository.existsById(employeeId)) {
+        boolean exists = employeeRepository.existsById(employeeId);
+        if (exists) {
             logger.info("Deleting employee with ID: {}", employeeId);
             employeeRepository.deleteById(employeeId);
-            return true;
         } else {
             logger.warn("Employee with ID {} not found for deletion", employeeId);
-            return false;
         }
+        return exists;
     }
 
     @Override
