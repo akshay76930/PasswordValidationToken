@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,17 +35,23 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
     @Autowired
     public AuthController(AuthRequestService authRequestService, UserRepository userRepository,
-                          JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+                          JwtUtil jwtUtil, PasswordEncoder passwordEncoder,
+                          AuthenticationManager authenticationManager,
+                          UserDetailsService userDetailsService) {
         this.authRequestService = authRequestService;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
     }
 
     @PostMapping("/login")
@@ -72,5 +83,28 @@ public class AuthController {
         String testUsername = "test user";
         String token = jwtUtil.generateToken(testUsername);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) {
+        String username = authRequest.getUsername();
+        String password = authRequest.getPassword();
+
+        try {
+            // Authenticate the user using username and password
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (BadCredentialsException e) {
+            logger.warn("Invalid credentials for user: {}", username);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        } catch (Exception e) {
+            logger.error("Authentication failed for user: {}", username, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication failed");
+        }
+
+        // Load user details and generate JWT token
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String jwtToken = jwtUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new AuthResponse(jwtToken)); // Assuming you have a class to return the JWT
     }
 }
