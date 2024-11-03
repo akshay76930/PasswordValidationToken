@@ -10,18 +10,18 @@ import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
 
 public interface EmployeeService {
 
-	List<Employee> findAll();
+    List<Employee> findAll();
 
-	Employee insertEmployee(Employee employee);
+    Employee insertEmployee(Employee employee);
 
-	Employee updateEmployee(Employee employee);
+    Employee updateEmployee(Long id, Employee employee);
 
-	boolean deleteEmployee(Long employeeId);
+    boolean deleteEmployee(Long employeeId);
 
-	Optional<Employee> findById(Long id);
+    Optional<Employee> findById(Long id);
 
-	List<Employee> searchEmployees(String name, String gender);
+    List<Employee> searchEmployees(String name, String gender);
 
-	Page<Employee> findAllWithPagination(PageRequest pageRequest);
+    Page<Employee> findAllWithPagination(PageRequest pageRequest);
 
 }

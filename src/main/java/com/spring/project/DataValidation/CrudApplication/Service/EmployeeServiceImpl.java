@@ -14,115 +14,121 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.project.DataValidation.CrudApplication.Dao.EmployeeDao;
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
+import com.spring.project.DataValidation.CrudApplication.Exception.EmailAlreadyExistsException;
+import com.spring.project.DataValidation.CrudApplication.Exception.InvalidPasswordException;
 import com.spring.project.DataValidation.CrudApplication.Repository.EmployeeRepository;
-import com.spring.project.DataValidation.CrudApplication.Service.EmployeeService;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
-	private static final String DEFAULT_PASSWORD = "SecureDefaultPassword123!";
-	private static final Pattern PASSWORD_PATTERN = Pattern
-			.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])(?=.{8,})");
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+    private static final String DEFAULT_PASSWORD = "SecureDefaultPassword123!";
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])(?=.{8,})");
 
-	@Autowired
-	private EmployeeRepository employeeRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-	@Autowired
-	private final EmployeeDao employeeDao;
+    @Autowired
+    private final EmployeeDao employeeDao;
 
-	// Constructor for injecting EmployeeDao
-	public EmployeeServiceImpl(EmployeeDao employeeDao) {
-		this.employeeDao = employeeDao;
-	}
+    // Constructor for injecting EmployeeDao
+    public EmployeeServiceImpl(EmployeeDao employeeDao) {
+        this.employeeDao = employeeDao;
+    }
 
-	@Override
-	public List<Employee> findAll() {
-		logger.info("Fetching all employees");
-		return employeeDao.findAll();
-	}
+    @Override
+    public List<Employee> findAll() {
+        logger.info("Fetching all employees");
+        return employeeDao.findAll();
+    }
 
-	@Override
-	@Transactional
-	public Employee insertEmployee(Employee employee) {
-		logger.info("Inserting a new employee: {}", employee.getName());
+    @Override
+    @Transactional
+    public Employee insertEmployee(Employee employee) throws InvalidPasswordException, EmailAlreadyExistsException {
+        logger.info("Inserting a new employee: {}", employee.getName());
 
-		// Validate the provided password
-		String password = Optional.ofNullable(employee.getPassword()).filter(p -> !p.isEmpty() && isValidPassword(p))
-				.orElseGet(() -> {
-					logger.warn("Invalid or no password provided, assigning default password");
-					return DEFAULT_PASSWORD;
-				});
+        String password = Optional.ofNullable(employee.getPassword())
+                .filter(p -> !p.isEmpty())
+                .orElseGet(() -> {
+                    logger.warn("No password provided, assigning default password");
+                    return DEFAULT_PASSWORD;
+                });
 
-		employee.setPassword(password);
+        if (!isValidPassword(password)) {
+            logger.error("Invalid password for employee: {}", employee.getName());
+            throw new InvalidPasswordException("Password must be at least 8 characters long, contain at least one letter, one number, and one special character.");
+        }
 
-		// Check for existing employee with the same email
-		if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
-			throw new RuntimeException("Email address already in use");
-		}
+        employee.setPassword(password);
 
-		return employeeRepository.save(employee);
-	}
+        // Check for existing employee with the same email
+        if (employeeRepository.findByEmail(employee.getEmail()).isPresent()) {
+            logger.error("Email address already in use: {}", employee.getEmail());
+            throw new EmailAlreadyExistsException("Email address already in use");
+        }
 
-	@Override
-	@Transactional
-	public Employee updateEmployee(Employee employee) {
-		logger.info("Updating employee with ID: {}", employee.getId());
-		try {
-			employeeDao.updateEmployee(employee);
-			logger.info("Successfully updated employee with ID: {}", employee.getId());
-			return employee;
-		} catch (Exception e) {
-			logger.error("Failed to update employee with ID: {}", employee.getId(), e);
-			throw new RuntimeException("Failed to update employee", e);
-		}
-	}
+        return employeeRepository.save(employee);
+    }
 
-	@Override
-	@Transactional
-	public boolean deleteEmployee(Long employeeId) {
-		logger.info("Deleting employee with ID: {}", employeeId);
-		try {
-			boolean isDeleted = employeeDao.deleteEmployee(employeeId);
-			if (isDeleted) {
-				logger.info("Successfully deleted employee with ID: {}", employeeId);
-				return true;
-			} else {
-				logger.warn("Employee with ID: {} not found for deletion", employeeId);
-				return false;
-			}
-		} catch (Exception e) {
-			logger.error("Failed to delete employee with ID: {}", employeeId, e);
-			return false;
-		}
-	}
+    @Override
+    @Transactional
+    public Employee updateEmployee(Long id, Employee employee) {
+        logger.info("Updating employee with ID: {}", id);
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with ID: " + id));
 
-	@Override
-	public Optional<Employee> findById(Long id) {
-		logger.info("Fetching employee with ID: {}", id);
-		return employeeDao.findById(id);
-	}
+        existingEmployee.setName(employee.getName());
+        existingEmployee.setEmail(employee.getEmail());
+        existingEmployee.setGender(employee.getGender());
+        // Update other fields as necessary
 
-	@Override
-	public List<Employee> searchEmployees(String name, String gender) {
-		// Perform dynamic filtering based on name and gender
-		if (name != null && gender != null) {
-			return employeeRepository.findByNameAndGender(name, gender);
-		} else if (name != null) {
-			return employeeRepository.findByName(name);
-		} else if (gender != null) {
-			return employeeRepository.findByGender(gender);
-		} else {
-			return employeeRepository.findAll();
-		}
-	}
+        return employeeRepository.save(existingEmployee);
+    }
 
-	@Override
-	public Page<Employee> findAllWithPagination(PageRequest pageRequest) {
-		return employeeRepository.findAll(pageRequest);
-	}
+    @Override
+    @Transactional
+    public boolean deleteEmployee(Long employeeId) {
+        logger.info("Deleting employee with ID: {}", employeeId);
+        try {
+            if (employeeRepository.existsById(employeeId)) {
+                employeeRepository.deleteById(employeeId);
+                logger.info("Successfully deleted employee with ID: {}", employeeId);
+                return true;
+            } else {
+                logger.warn("Employee with ID: {} not found for deletion", employeeId);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Failed to delete employee with ID: {}", employeeId, e);
+            return false;
+        }
+    }
 
-	private boolean isValidPassword(String password) {
-		return PASSWORD_PATTERN.matcher(password).matches();
-	}
+    @Override
+    public Optional<Employee> findById(Long id) {
+        logger.info("Fetching employee with ID: {}", id);
+        return employeeDao.findById(id);
+    }
+
+    @Override
+    public List<Employee> searchEmployees(String name, String gender) {
+        if (name != null && gender != null) {
+            return employeeRepository.findByNameAndGender(name, gender);
+        } else if (name != null) {
+            return employeeRepository.findAllOrderedByName();
+        } else if (gender != null) {
+            return employeeRepository.findByGender(gender);
+        } else {
+            return employeeRepository.findAll();
+        }
+    }
+
+    @Override
+    public Page<Employee> findAllWithPagination(PageRequest pageRequest) {
+        return employeeRepository.findAll(pageRequest);
+    }
+
+    private boolean isValidPassword(String password) {
+        return PASSWORD_PATTERN.matcher(password).matches();
+    }
 }

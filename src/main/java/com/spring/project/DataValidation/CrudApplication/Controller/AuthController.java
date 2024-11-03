@@ -43,9 +43,9 @@ public class AuthController {
 
     @Autowired
     public AuthController(AuthRequestService authRequestService, UserRepository userRepository,
-                          JwtUtil jwtUtil, PasswordEncoder passwordEncoder,
-                          AuthenticationManager authenticationManager,
-                          UserDetailsService userDetailsService) {
+            JwtUtil jwtUtil, PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            UserDetailsService userDetailsService) {
         this.authRequestService = authRequestService;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
@@ -75,7 +75,7 @@ public class AuthController {
         authRequest.setPassword(passwordEncoder.encode(authRequest.getPassword()));
         AuthRequest savedAuthRequest = authRequestService.saveAuthRequest(authRequest);
         logger.info("User registered successfully: {}", authRequest.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthRequest); // Changed to 201 Created
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthRequest); // 201 Created
     }
 
     @PostMapping("/test-token")
@@ -86,7 +86,7 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticate(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<String> authenticate(@RequestBody AuthRequest authRequest) {
         String username = authRequest.getUsername();
         String password = authRequest.getPassword();
 
@@ -103,8 +103,9 @@ public class AuthController {
 
         // Load user details and generate JWT token
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        String jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtUtil.generateToken(username);
+        logger.info("JWT token generated for user: {}", username);
 
-        return ResponseEntity.ok(new AuthResponse(jwtToken)); // Assuming you have a class to return the JWT
+        return ResponseEntity.ok(jwtToken); // Return the JWT token
     }
 }

@@ -3,11 +3,25 @@ package com.spring.project.DataValidation.CrudApplication.Entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import javax.persistence.*;
+import java.util.Set;
 
-/**
- * Entity class representing an employee.
- */
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "employee")
 public class Employee implements Serializable {
@@ -18,38 +32,65 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100) // Name cannot be null and has a max length
+    @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(length = 15)
     private String contact;
 
+    @Column(length = 10)
     private String gender;
 
-    @Column(nullable = false, unique = true, length = 100) // Email must be unique and cannot be null
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false) // Password cannot be null
+    @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false) // Expiration date cannot be null
+    @Column(nullable = false)
     private LocalDateTime expirationDate;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many Employees can relate to one User
-    @JoinColumn(name = "user_id", nullable = false) // Foreign key for the User entity
+    @Column(nullable = false)
+    private LocalDateTime dateOfJoining;
+
+    @Column(length = 255)
+    private String address;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EmployeeStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department; // Reference to Department entity
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user; // Reference to User entity
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Set<Project> projects;
 
     // Default constructor
     public Employee() {}
 
     // Constructor with parameters
-    public Employee(String name, String contact, String gender, String email, String password, LocalDateTime expirationDate, User user) {
+    public Employee(String name, String contact, String gender, String email, String password,
+                    LocalDateTime expirationDate, LocalDateTime dateOfJoining, String address,
+                    EmployeeStatus status, Department department, User user) {
         this.name = name;
         this.contact = contact;
         this.gender = gender;
         this.email = email;
-        this.password = password; // Consider hashing this password before setting it
+        this.password = password; 
         this.expirationDate = expirationDate;
-        this.user = user; // Initialize User reference
+        this.dateOfJoining = dateOfJoining;
+        this.address = address;
+        this.status = status;
+        this.department = department;
+        this.user = user; 
     }
 
     // Getters and Setters
@@ -98,7 +139,7 @@ public class Employee implements Serializable {
     }
 
     public void setPassword(String password) {
-        this.password = password; // Consider hashing this password before setting it
+        this.password = password; 
     }
 
     public LocalDateTime getExpirationDate() {
@@ -109,17 +150,58 @@ public class Employee implements Serializable {
         this.expirationDate = expirationDate;
     }
 
+    public LocalDateTime getDateOfJoining() {
+        return dateOfJoining;
+    }
+
+    public void setDateOfJoining(LocalDateTime dateOfJoining) {
+        this.dateOfJoining = dateOfJoining;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public EmployeeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EmployeeStatus status) {
+        this.status = status;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department; // This is the new setter
+    }
+
     public User getUser() {
-        return user; // Getter for User reference
+        return user;
     }
 
     public void setUser(User user) {
-        this.user = user; // Setter for User reference
+        this.user = user;
+    }
+
+    public Set<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
     }
 
     @Override
     public String toString() {
-        return "Employee [id=" + id + ", name=" + name + ", contact=" + contact + ", gender=" + gender + ", email=" + email + "]";
+        return "Employee [id=" + id + ", name=" + name + ", contact=" + contact + ", gender=" + gender + ", email="
+                + email + ", dateOfJoining=" + dateOfJoining + ", status=" + status + "]";
     }
 
     @Override

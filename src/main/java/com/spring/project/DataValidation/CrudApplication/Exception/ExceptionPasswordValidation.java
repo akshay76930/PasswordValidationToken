@@ -1,4 +1,4 @@
-package com.spring.project.DataValidation.CrudApplication.ExceptionHandling;
+package com.spring.project.DataValidation.CrudApplication.Exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

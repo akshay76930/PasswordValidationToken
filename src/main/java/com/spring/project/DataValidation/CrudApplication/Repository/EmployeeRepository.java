@@ -57,7 +57,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
      * @param name the exact name to search for.
      * @return a list of Employees with the specified name.
      */
-    List<Employee> findByName(String name);
+    List<Employee> findAllByOrderByIdAsc(); 
 
     /**
      * Finds employees by both name and gender.
