@@ -1,3 +1,9 @@
+/**
+ * Entity class representing a password reset token.
+ * 
+ * <p>Author: Akshay Dhere &lt;akshaydhere14@gmail.com&gt;</p>
+ */
+
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
 import java.io.Serializable;

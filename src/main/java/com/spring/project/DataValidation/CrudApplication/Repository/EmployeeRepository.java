@@ -20,12 +20,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmail(String email);
 
     /**
-     * Finds all employees of a specific gender.
+     * Finds employees by their gender (case-insensitive).
      *
      * @param gender the gender to filter employees by.
      * @return a list of Employees matching the specified gender.
      */
-    List<Employee> findByGender(String gender);
+    List<Employee> findByGenderIgnoreCase(String gender);
 
     /**
      * Finds an employee by their contact number.
@@ -44,6 +44,15 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByNameContainingIgnoreCase(String name);
 
     /**
+     * Finds employees by both name and gender (case-insensitive).
+     *
+     * @param name   the name to filter employees by.
+     * @param gender the gender to filter employees by.
+     * @return a list of Employees matching the specified name and gender.
+     */
+    List<Employee> findByNameContainingIgnoreCaseAndGenderIgnoreCase(String name, String gender);
+
+    /**
      * Counts the number of employees of a specific gender.
      *
      * @param gender the gender to count employees by.
@@ -52,30 +61,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByGender(String gender);
 
     /**
-     * Finds employees by their name (exact match).
-     *
-     * @param name the exact name to search for.
-     * @return a list of Employees with the specified name.
-     */
-    List<Employee> findAllByOrderByIdAsc(); 
-
-    /**
-     * Finds employees by both name and gender.
-     *
-     * @param name   the name to filter employees by.
-     * @param gender the gender to filter employees by.
-     * @return a list of Employees matching the specified name and gender.
-     */
-    List<Employee> findByNameAndGender(String name, String gender);
-    
-    /**
      * Finds all employees ordered by their name.
      *
      * @return a list of all Employees ordered by name.
      */
     @Query("SELECT e FROM Employee e ORDER BY e.name")
     List<Employee> findAllOrderedByName();
-    
+
     /**
      * Finds employees by name starting with a specific prefix (case-insensitive).
      *

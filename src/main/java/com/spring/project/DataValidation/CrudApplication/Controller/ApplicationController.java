@@ -1,6 +1,7 @@
 package com.spring.project.DataValidation.CrudApplication.Controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -15,9 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
+import com.spring.project.DataValidation.CrudApplication.Response.ApiResponse;
 import com.spring.project.DataValidation.CrudApplication.Service.EmailNotificationService;
 import com.spring.project.DataValidation.CrudApplication.Service.EmployeeService;
-import com.spring.project.DataValidation.CrudApplication.Response.ApiResponse;
 
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -35,47 +36,54 @@ public class ApplicationController {
 
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<Employee>>> getAllEmployees() {
-        logInfo("Fetching all employees");
-        List<Employee> employees = employeeService.findAll();
-        return buildResponse(employees);
+        logger.info("Fetching all employees");
+        List<Employee> employees = employeeService.getAllEmployees();
+        return employees.isEmpty()
+                ? buildNoContentResponse()
+                : ResponseEntity.ok(new ApiResponse<>(employees));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Employee>> getEmployeeById(@PathVariable Long id) {
-        logInfo("Fetching employee with ID: {}", id);
-        Employee employee = employeeService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
-        return ResponseEntity.ok(new ApiResponse<>(employee));
+        logger.info("Fetching employee with ID: {}", id);
+        return employeeService.getEmployeeById(id)
+                .map(employee -> ResponseEntity.ok(new ApiResponse<>(employee)))
+                .orElseGet(() -> buildNotFoundResponse("Employee not found"));
     }
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<Employee>> insertEmployee(@Valid @RequestBody Employee employee) {
-        logInfo("Inserting a new employee: {}", employee.getName());
+        logger.info("Inserting a new employee: {}", employee.getName());
         Employee savedEmployee = employeeService.insertEmployee(employee);
         return buildCreatedResponse(new ApiResponse<>(savedEmployee));
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiResponse<Void>> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
-        logInfo("Updating employee with ID: {}", id);
-        employeeService.updateEmployee(id, employee);
-        return ResponseEntity.ok(new ApiResponse<>(null));
+        logger.info("Updating employee with ID: {}", id);
+        return employeeService.updateEmployee(id, employee)
+                ? ResponseEntity.ok(new ApiResponse<>(null))  
+                : buildNotFoundResponse("Employee not found");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteEmployee(@PathVariable Long id) {
-        logInfo("Deleting employee with ID: {}", id);
-        employeeService.deleteEmployee(id);
-        return ResponseEntity.ok(new ApiResponse<>(null));
+        logger.info("Deleting employee with ID: {}", id);
+        return employeeService.deleteEmployee(id)
+                ? ResponseEntity.ok(new ApiResponse<>(null))  
+                : buildNotFoundResponse("Employee not found");
     }
+
 
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<Employee>>> searchEmployees(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String gender) {
-        logInfo("Searching employees by name: {} and gender: {}", name, gender);
+        logger.info("Searching employees by name: {} and gender: {}", name, gender);
         List<Employee> employees = employeeService.searchEmployees(name, gender);
-        return buildResponse(employees);
+        return employees.isEmpty()
+                ? buildNoContentResponse()
+                : ResponseEntity.ok(new ApiResponse<>(employees));
     }
 
     @GetMapping("/page")
@@ -83,36 +91,36 @@ public class ApplicationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy) {
-        logInfo("Fetching employees page: {}, size: {}, sorted by: {}", page, size, sortBy);
+        logger.info("Fetching employees page: {}, size: {}, sorted by: {}", page, size, sortBy);
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
-        Page<Employee> employeesPage = employeeService.findAllWithPagination(pageRequest);
-        return ResponseEntity.ok(new ApiResponse<>(employeesPage));
+        Page<Employee> employeesPage = employeeService.getEmployeesWithPagination(pageRequest);
+        return employeesPage.isEmpty()
+                ? buildNoContentResponse()
+                : ResponseEntity.ok(new ApiResponse<>(employeesPage));
     }
 
     @PostMapping("/sendEmail")
     public ResponseEntity<ApiResponse<String>> sendEmail(@RequestParam String to, @RequestParam String subject) {
         emailNotificationService.sendEmailWithTemplate(to, subject);
-        logInfo("Email sent to {}", to);
+        logger.info("Email sent to {} with subject {}", to, subject);
         return ResponseEntity.ok(new ApiResponse<>("Email sent successfully to " + to));
     }
 
     // Helper Methods
-    private void logInfo(String message, Object... params) {
-        if (logger.isInfoEnabled()) {
-            logger.info(message, params);
-        }
+    private <T> ResponseEntity<ApiResponse<T>> buildNoContentResponse() {
+        logger.info("No content to return. Returning 204 No Content");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>(null));
     }
 
     private <T> ResponseEntity<ApiResponse<T>> buildNotFoundResponse(String message) {
-        logInfo(message);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(message));
+        logger.warn(message + " Returning 404 Not Found");
+        ApiResponse<T> apiResponse = new ApiResponse<>(null);
+        apiResponse.setMessage(message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiResponse);
     }
 
     private <T> ResponseEntity<ApiResponse<T>> buildCreatedResponse(ApiResponse<T> response) {
+        logger.info("Resource created successfully. Returning 201 Created");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    private <T> ResponseEntity<ApiResponse<List<T>>> buildResponse(List<T> list) {
-        return list.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(new ApiResponse<>(list));
     }
 }

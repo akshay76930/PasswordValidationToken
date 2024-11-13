@@ -22,7 +22,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService; // Assuming you have an EmailService
+    private final EmailService emailService;
 
     public UserService(UserRepository userRepository, PasswordResetTokenRepository tokenRepository, 
                        PasswordEncoder passwordEncoder, EmailService emailService) {
@@ -47,7 +47,7 @@ public class UserService {
         // Check if token has expired
         if (resetToken.getExpirationDate().isBefore(LocalDateTime.now())) {
             logger.warn("Expired password reset token: {}", token);
-            tokenRepository.delete(resetToken);  // Optionally clean up expired token
+            tokenRepository.delete(resetToken);  // Clean up expired token
             return false;
         }
 

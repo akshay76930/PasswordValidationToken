@@ -15,41 +15,66 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailNotificationService {
 
+    // Logger instance to log relevant information and errors
     private static final Logger logger = LoggerFactory.getLogger(EmailNotificationService.class);
 
+    // Injecting the JavaMailSender to send emails
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${email.sender}") // Inject the email sender from properties
+    // Injecting the sender email address from application.properties
+    @Value("${email.sender}")
     private String emailSender;
 
-    @Async
+    /**
+     * This method sends an email asynchronously using the specified subject.
+     * It uses a simple email content template, but can be expanded to integrate with a more complex template engine.
+     * 
+     * @param to The recipient's email address
+     * @param subject The subject of the email
+     */
+    @Async // Marks this method to be executed asynchronously, improving performance by not blocking the main thread
     public void sendEmailWithTemplate(String to, String subject) {
-        // Prepare the email content model (placeholders for the template)
-        String emailContent = "This is a test email notification."; // You can expand this to use a proper template
+        // Example email content, this could be replaced with a dynamic template or content
+        String emailContent = "This is a test email notification."; 
+        
+        // Attempt to send the email and log success/failure
         boolean isSent = sendEmail(to, subject, emailContent);
 
         if (isSent) {
-            logger.info("Email sent successfully to {}", to);
+            logger.info("Email sent successfully to {}", to); // Log if email is sent successfully
         } else {
-            logger.warn("Failed to send email to {}", to);
+            logger.warn("Failed to send email to {}", to); // Log a warning if sending fails
         }
     }
 
-    // Method to send email with the filled template content
+    /**
+     * Method to construct and send an email.
+     * 
+     * @param to The recipient's email address
+     * @param subject The subject of the email
+     * @param content The body of the email
+     * @return true if the email was sent successfully, false otherwise
+     */
     private boolean sendEmail(String to, String subject, String content) {
+        // Create a MimeMessage instance to represent the email
         MimeMessage mimeMessage = mailSender.createMimeMessage();
+        
         try {
+            // Helper class to set various properties of the email like to, subject, content, etc.
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(content, true);
-            helper.setFrom(emailSender); // Use the injected sender email
+            helper.setTo(to); // Set recipient's email
+            helper.setSubject(subject); // Set the email subject
+            helper.setText(content, true); // Set the body content and specify HTML support
+            helper.setFrom(emailSender); // Set the sender email address (from application.properties)
+            
+            // Send the email using the JavaMailSender
             mailSender.send(mimeMessage);
-            return true; // Indicate success
+            return true; // Return true to indicate success
         } catch (MessagingException e) {
+            // Log error if email sending fails
             logger.error("Failed to send email to {}: {}", to, e.getMessage());
-            return false; // Indicate failure
+            return false; // Return false to indicate failure
         }
     }
 }

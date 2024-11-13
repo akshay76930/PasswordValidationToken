@@ -1,26 +1,26 @@
+/**
+ * Entity representing an Employee.
+ * 
+ * <p>Author: Akshay Dhere &lt;akshaydhere14@gmail.com&gt;</p>
+ */
+
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "employee")
@@ -56,22 +56,10 @@ public class Employee implements Serializable {
     @Column(length = 255)
     private String address;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EmployeeStatus status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", nullable = false)
-    private Department department; // Reference to Department entity
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user; // Reference to User entity
-
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
-    private Set<Project> projects;
 
     // Default constructor
     public Employee() {}
@@ -79,7 +67,7 @@ public class Employee implements Serializable {
     // Constructor with parameters
     public Employee(String name, String contact, String gender, String email, String password,
                     LocalDateTime expirationDate, LocalDateTime dateOfJoining, String address,
-                    EmployeeStatus status, Department department, User user) {
+                    User user) {
         this.name = name;
         this.contact = contact;
         this.gender = gender;
@@ -88,8 +76,6 @@ public class Employee implements Serializable {
         this.expirationDate = expirationDate;
         this.dateOfJoining = dateOfJoining;
         this.address = address;
-        this.status = status;
-        this.department = department;
         this.user = user; 
     }
 
@@ -166,22 +152,6 @@ public class Employee implements Serializable {
         this.address = address;
     }
 
-    public EmployeeStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(EmployeeStatus status) {
-        this.status = status;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department; // This is the new setter
-    }
-
     public User getUser() {
         return user;
     }
@@ -190,18 +160,10 @@ public class Employee implements Serializable {
         this.user = user;
     }
 
-    public Set<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(Set<Project> projects) {
-        this.projects = projects;
-    }
-
     @Override
     public String toString() {
         return "Employee [id=" + id + ", name=" + name + ", contact=" + contact + ", gender=" + gender + ", email="
-                + email + ", dateOfJoining=" + dateOfJoining + ", status=" + status + "]";
+                + email + ", dateOfJoining=" + dateOfJoining + "]";
     }
 
     @Override

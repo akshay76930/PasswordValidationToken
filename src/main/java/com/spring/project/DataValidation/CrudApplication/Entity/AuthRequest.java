@@ -1,13 +1,21 @@
+/**
+ * Entity representing authentication request data.
+ * 
+ * <p>Author: Akshay Dhere &lt;akshaydhere14@gmail.com&gt;</p>
+ */
+
 package com.spring.project.DataValidation.CrudApplication.Entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class AuthRequest {
     @Id
-    private Long id; // Assuming you have an ID field
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-generate ID
+    private Long id;
     private String username; // Ensure this field exists
     private String password; // Ensure this field exists
     private String token; // If this is needed as well

@@ -1,42 +1,50 @@
+/**
+ * This class is responsible for mapping a row from the ResultSet to an Employee object.
+ * It implements the RowMapper interface, which is used by Spring JDBC to convert each row 
+ * of a result set into an object.
+ * 
+ * <p>Author: Akshay Dhere &lt;akshaydhere14@gmail.com&gt;</p>
+ */
+
 package com.spring.project.DataValidation.CrudApplication.Mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.spring.project.DataValidation.CrudApplication.Entity.Employee;
 
 /**
- * This class implements RowMapper interface to map the rows of a ResultSet
- * to an Employee entity.
+ * RowMapper implementation that maps rows of the result set to Employee objects.
+ * This class helps in converting the rows from the database into Employee entity objects.
  */
 public class EmployeeMapper implements RowMapper<Employee> {
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeMapper.class);
+
     /**
-     * Maps a single row of the ResultSet to an Employee object.
+     * Maps each row of the ResultSet to an Employee entity.
      *
-     * @param rs     the ResultSet to map (pre-initialized for the current row)
-     * @param rowNum the number of the current row (starting from 0)
-     * @return an Employee object populated with data from the ResultSet
-     * @throws SQLException if a SQLException is encountered getting column values
+     * @param rs The ResultSet to be mapped.
+     * @param rowNum The number of the current row (unused here).
+     * @return A mapped Employee entity.
+     * @throws SQLException if an error occurs while accessing the ResultSet.
      */
     @Override
     public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
         Employee employee = new Employee();
-        
+
+        // Mapping each column in the ResultSet to the corresponding field in the Employee object
         employee.setId(rs.getLong("id"));
         employee.setName(rs.getString("name"));
         employee.setContact(rs.getString("contact"));
         employee.setGender(rs.getString("gender"));
         employee.setEmail(rs.getString("email"));
 
-        // Password handling: Ensure this is hashed in your entity or retrieved securely
-        String password = rs.getString("password");
-        if (password != null) {
-            employee.setPassword(password); // Placeholder - use secure handling in practice
-        }
-
+        // Returning the mapped Employee object
         return employee;
     }
 }
