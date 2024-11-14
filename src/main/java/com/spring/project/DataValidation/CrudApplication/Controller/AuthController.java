@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.project.DataValidation.CrudApplication.Entity.AuthRequest;
 import com.spring.project.DataValidation.CrudApplication.Entity.User;
+import com.spring.project.DataValidation.CrudApplication.Repository.AuthRequestRepository;
 import com.spring.project.DataValidation.CrudApplication.Repository.UserRepository;
 import com.spring.project.DataValidation.CrudApplication.Security.JwtUtil;
 import com.spring.project.DataValidation.CrudApplication.Service.AuthRequestService;
@@ -29,35 +31,42 @@ public class AuthController {
     private final AuthRequestService authRequestService;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthRequestRepository authRequestRepository;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
     @Autowired
     public AuthController(AuthRequestService authRequestService, UserRepository userRepository, JwtUtil jwtUtil,
-                          PasswordEncoder passwordEncoder) {
+    		BCryptPasswordEncoder passwordEncoder, AuthRequestRepository authRequestRepository) {
         this.authRequestService = authRequestService;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+		this.authRequestRepository = authRequestRepository;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
-        Optional<User> userOptional = userRepository.findByUsername(authRequest.getUsername());
+    public ResponseEntity<String> getToken(@RequestBody AuthRequest authRequest) {
+        // Retrieve the user based on the username
+        Optional<AuthRequest> userOptional = authRequestRepository.findByUsername(authRequest.getUsername());
 
         return userOptional.filter(user -> passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
                 .map(user -> {
+                    // Generate the JWT token for the authenticated user
                     String token = jwtUtil.generateToken(user.getUsername());
                     logger.info("Token generated for user: {}", authRequest.getUsername());
                     return ResponseEntity.ok(token);
                 })
                 .orElseGet(() -> {
+                    // Log warning and return Unauthorized status for invalid credentials
                     logger.warn("Login failed for user: {}", authRequest.getUsername());
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
                 });
     }
+
+
 
     @PostMapping("/register")
     public ResponseEntity<AuthRequest> register(@RequestBody AuthRequest authRequest) {

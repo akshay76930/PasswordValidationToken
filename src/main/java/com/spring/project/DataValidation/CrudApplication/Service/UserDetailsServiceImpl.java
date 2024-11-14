@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.spring.project.DataValidation.CrudApplication.Entity.AuthRequest;
 import com.spring.project.DataValidation.CrudApplication.Entity.User;
 import com.spring.project.DataValidation.CrudApplication.Repository.UserRepository;
 
