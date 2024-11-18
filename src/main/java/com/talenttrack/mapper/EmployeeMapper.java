@@ -43,7 +43,7 @@ public class EmployeeMapper implements RowMapper<Employee> {
         employee.setGender(rs.getString("gender"));
         employee.setEmail(rs.getString("email"));
 
-        // Returning the mapped Employee object
+       
         return employee;
     }
 }

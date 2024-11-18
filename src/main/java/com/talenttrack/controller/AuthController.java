@@ -24,60 +24,51 @@ import com.talenttrack.service.AuthRequestService;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    private final AuthRequestService authRequestService;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final AuthRequestRepository authRequestRepository;
+	private final AuthRequestService authRequestService;
+	private final UserRepository userRepository;
+	private final JwtUtil jwtUtil;
+	private final BCryptPasswordEncoder passwordEncoder;
+	private final AuthRequestRepository authRequestRepository;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
+	@Value("${jwt.expiration}")
+	private long jwtExpiration;
 
-    @Autowired
-    public AuthController(AuthRequestService authRequestService, UserRepository userRepository, JwtUtil jwtUtil,
-    		BCryptPasswordEncoder passwordEncoder, AuthRequestRepository authRequestRepository) {
-        this.authRequestService = authRequestService;
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-        this.passwordEncoder = passwordEncoder;
+	@Autowired
+	public AuthController(AuthRequestService authRequestService, UserRepository userRepository, JwtUtil jwtUtil,
+			BCryptPasswordEncoder passwordEncoder, AuthRequestRepository authRequestRepository) {
+		this.authRequestService = authRequestService;
+		this.userRepository = userRepository;
+		this.jwtUtil = jwtUtil;
+		this.passwordEncoder = passwordEncoder;
 		this.authRequestRepository = authRequestRepository;
-    }
+	}
 
-    @PostMapping("/login")
-    public ResponseEntity<String> getToken(@RequestBody AuthRequest authRequest) {
-        // Retrieve the user based on the username
-        Optional<AuthRequest> userOptional = authRequestRepository.findByUsername(authRequest.getUsername());
+	@PostMapping("/login")
+	public ResponseEntity<String> getToken(@RequestBody AuthRequest authRequest) {
+		// Retrieve the user based on the username
+		Optional<AuthRequest> userOptional = authRequestRepository.findByUsername(authRequest.getUsername());
 
-        return userOptional.filter(user -> passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
-                .map(user -> {
-                    // Generate the JWT token for the authenticated user
-                    String token = jwtUtil.generateToken(user.getUsername());
-                    logger.info("Token generated for user: {}", authRequest.getUsername());
-                    return ResponseEntity.ok(token);
-                })
-                .orElseGet(() -> {
-                    // Log warning and return Unauthorized status for invalid credentials
-                    logger.warn("Login failed for user: {}", authRequest.getUsername());
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-                });
-    }
+		return userOptional.filter(user -> passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
+				.map(user -> {
+					// Generate the JWT token for the authenticated user
+					String token = jwtUtil.generateToken(user.getUsername());
+					logger.info("Token generated for user: {}", authRequest.getUsername());
+					return ResponseEntity.ok(token);
+				}).orElseGet(() -> {
+					// Log warning and return Unauthorized status for invalid credentials
+					logger.warn("Login failed for user: {}", authRequest.getUsername());
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+				});
+	}
 
+	@PostMapping("/register")
+	public ResponseEntity<AuthRequest> register(@RequestBody AuthRequest authRequest) {
+		authRequest.setPassword(passwordEncoder.encode(authRequest.getPassword()));
+		AuthRequest savedAuthRequest = authRequestService.saveAuthRequest(authRequest);
+		logger.info("User registered successfully: {}", authRequest.getUsername());
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthRequest);
+	}
 
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthRequest> register(@RequestBody AuthRequest authRequest) {
-        authRequest.setPassword(passwordEncoder.encode(authRequest.getPassword()));
-        AuthRequest savedAuthRequest = authRequestService.saveAuthRequest(authRequest);
-        logger.info("User registered successfully: {}", authRequest.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedAuthRequest);
-    }
-
-    @PostMapping("/test-token")
-    public ResponseEntity<String> testToken() {
-        String token = jwtUtil.generateToken("testUser");
-        logger.info("Test token generated for 'testUser'");
-        return ResponseEntity.ok(token);
-    }
 }

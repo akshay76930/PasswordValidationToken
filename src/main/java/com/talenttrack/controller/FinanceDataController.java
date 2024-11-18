@@ -11,29 +11,26 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import com.talenttrack.service.FinanceDataService;
 
 import reactor.core.publisher.Mono;
+
 @RestController
 public class FinanceDataController {
 
-    @Autowired
-    private FinanceDataService financeDataService;
+	@Autowired
+	private FinanceDataService financeDataService;
 
-    @GetMapping("/finance/realtime-quotes")
-    public Mono<ResponseEntity<String>> getRealtimeQuotes(@RequestParam String saIds) {
-        return financeDataService.getRealtimeQuotes(saIds)
-                .map(ResponseEntity::ok) // Wrap the response in ResponseEntity
-                .onErrorResume(e -> {
-                    // Log the error for debugging
-                    e.printStackTrace();
-                    if (e instanceof WebClientResponseException) {
-                        WebClientResponseException webClientResponseException = (WebClientResponseException) e;
-                        if (webClientResponseException.getStatusCode() == HttpStatus.FORBIDDEN) {
-                            return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN)
-                                    .body("Access forbidden. Check your API key and permissions."));
-                        }
-                    }
-                    return Mono.just(ResponseEntity.internalServerError()
-                            .body("Error fetching data: " + e.getMessage()));
-                });
-    }
+	@GetMapping("/finance/realtime-quotes")
+	public Mono<ResponseEntity<String>> getRealtimeQuotes(@RequestParam String saIds) {
+		return financeDataService.getRealtimeQuotes(saIds).map(ResponseEntity::ok).onErrorResume(e -> {
+			e.printStackTrace();
+			if (e instanceof WebClientResponseException) {
+				WebClientResponseException webClientResponseException = (WebClientResponseException) e;
+				if (webClientResponseException.getStatusCode() == HttpStatus.FORBIDDEN) {
+					return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN)
+							.body("Access forbidden. Check your API key and permissions."));
+				}
+			}
+			return Mono.just(ResponseEntity.internalServerError().body("Error fetching data: " + e.getMessage()));
+		});
+	}
 
 }

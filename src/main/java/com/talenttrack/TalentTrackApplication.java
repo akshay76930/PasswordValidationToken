@@ -15,30 +15,24 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class TalentTrackApplication {
 
-    public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(TalentTrackApplication.class);
+	public static void main(String[] args) {
+		SpringApplication application = new SpringApplication(TalentTrackApplication.class);
+		application.setBanner(new CustomBanner());
+		application.run(args);
+	}
 
-        // Customize the application banner
-        application.setBanner(new CustomBanner());
+	@Bean
+	public ApplicationListener<ApplicationReadyEvent> onApplicationReadyEventListener() {
+		return event -> System.out.println("Application started successfully with profiles: "
+				+ String.join(", ", event.getApplicationContext().getEnvironment().getActiveProfiles()));
+	}
 
-        // Run the application
-        application.run(args);
-    }
-
-    // Application Ready Event Listener
-    @Bean
-    public ApplicationListener<ApplicationReadyEvent> onApplicationReadyEventListener() {
-        return event -> System.out.println("Application started successfully with profiles: " 
-                                            + String.join(", ", event.getApplicationContext().getEnvironment().getActiveProfiles()));
-    }
-
-    // Custom Banner Implementation
-    static class CustomBanner implements Banner {
-        @Override
-        public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
-            out.println("===================================");
-            out.println("   WELCOME TO THE EMPLOYEE MANAGEMENT SYSTEM  ");
-            out.println("===================================");
-        }
-    }
+	static class CustomBanner implements Banner {
+		@Override
+		public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
+			out.println("===================================");
+			out.println("   WELCOME TO THE EMPLOYEE MANAGEMENT SYSTEM  ");
+			out.println("===================================");
+		}
+	}
 }

@@ -16,30 +16,38 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests()
-				.antMatchers("/api/v1/auth/login", "/api/v1/auth/register","/finance/realtime-quotes").permitAll() // Public
-																														// access
-				.antMatchers("/api/v1/employees/sendEmail","/finance/realtime-quotes", "/api/v1/employees/create", "/api/v1/employees/update/**",
-						"/api/v1/employees/delete/**")
-				.authenticated() // Require authentication for specific employee actions
-				.antMatchers("/api/v1/employees/**").permitAll() // Public access for other employee endpoints
-				.anyRequest().authenticated() // Authenticate all other endpoints
-				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // Stateless sessions
-																									// for JWT
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf().disable()
+            .authorizeRequests()
+                .antMatchers(
+                    "/api/v1/auth/login",
+                    "/api/v1/auth/register",
+                    "/finance/realtime-quotes"
+                ).permitAll()
+                .antMatchers(
+                    "/api/v1/employees/sendEmail",
+                    "/api/v1/employees/create",
+                    "/api/v1/employees/update/**",
+                    "/api/v1/employees/delete/**"
+                ).authenticated() 
+                .antMatchers("/api/v1/employees/**").permitAll() 
+                .anyRequest().authenticated() 
+            .and()
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS); 
 
-		return http.build();
-	}
+        return http.build();
+    }
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-			throws Exception {
-		return authenticationConfiguration.getAuthenticationManager();
-	}
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) 
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 }
