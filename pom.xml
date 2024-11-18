@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.0</version> <!-- Compatible version for Java 8 -->
+		<version>2.7.0</version> <!-- Consider updating to the latest compatible Spring Boot version -->
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>com.spring.project.DataValidation</groupId>
-	<artifactId>CrudApplication</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>CrudApplication</name>
-	<description>Demo project for Spring Boot</description>
+	<groupId>com.talenttrack</groupId>
+	<artifactId>talent-track-service</artifactId>
+	<version>1.0.0</version>
+	<name>Talent Track Service</name>
+	<description>A Spring Boot project for managing employee and talent data</description>
 
 	<properties>
-		<java.version>1.8</java.version> <!-- Set Java version to 1.8 -->
-		<spring-boot.version>2.6.0</spring-boot.version> <!-- Match parent version -->
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<java.version>17</java.version> <!-- Updated Java version to 17 -->
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<hibernate.validator.version>6.2.0.Final</hibernate.validator.version>
 		<mysql.connector.version>8.0.30</mysql.connector.version>
-		<thymeleaf.version>3.0.12.RELEASE</thymeleaf.version> <!-- Keep Thymeleaf version -->
+		<thymeleaf.version>3.0.12.RELEASE</thymeleaf.version>
 		<slf4j.version>1.7.36</slf4j.version>
 	</properties>
 
@@ -42,6 +39,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
 		<!-- Springdoc OpenAPI for API documentation -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -49,29 +51,32 @@
 			<version>1.6.14</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- Hibernate Validator for Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>${hibernate.validator.version}</version><!--$NO-MVN-MAN-VER$ -->
+			<version>${hibernate.validator.version}</version>
 		</dependency>
-
 
 		<!-- Jakarta Annotation API for @Resource annotations -->
 		<dependency>
 			<groupId>jakarta.annotation</groupId>
 			<artifactId>jakarta.annotation-api</artifactId>
-			<version>1.3.5</version><!--$NO-MVN-MAN-VER$ -->
+			<version>1.3.5</version>
 		</dependency>
 
 		<!-- MySQL Connector -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql.connector.version}</version><!--$NO-MVN-MAN-VER$ -->
+			<version>${mysql.connector.version}</version>
 		</dependency>
-
-
 
 		<!-- Spring Boot Security Starter -->
 		<dependency>
@@ -83,19 +88,17 @@
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
-			<version>0.11.5</version> <!-- Use the latest stable version -->
+			<version>0.11.5</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
-			<version>0.11.5</version> <!-- Use the latest stable version -->
+			<version>0.11.5</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
-			<version>0.11.5</version> <!-- Use the latest stable version -->
+			<version>0.11.5</version>
 		</dependency>
 
 		<!-- Spring Boot DevTools for automatic restart -->
@@ -106,7 +109,6 @@
 			<optional>true</optional>
 		</dependency>
 
-
 		<!-- Spring Boot Starter Test for testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -114,17 +116,17 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		<!-- Spring Boot Mail Dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!-- Lombok for reducing boilerplate code -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.24</version><!--$NO-MVN-MAN-VER$ -->
+			<version>1.18.24</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
