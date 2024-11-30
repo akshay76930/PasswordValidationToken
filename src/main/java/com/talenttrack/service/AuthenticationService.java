@@ -9,17 +9,17 @@ import com.talenttrack.entity.AuthRequest;
 import com.talenttrack.repository.AuthRequestRepository;
 
 @Service
-public class AuthRequestService {
+public class AuthenticationService {
 
     // Logger instance to log relevant information
-    private static final Logger logger = LoggerFactory.getLogger(AuthRequestService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     // Repository instance to handle AuthRequest entity database operations
     private final AuthRequestRepository authRequestRepository;
 
     // Constructor-based injection of AuthRequestRepository to follow best practices
     @Autowired
-    public AuthRequestService(AuthRequestRepository authRequestRepository) {
+    public AuthenticationService(AuthRequestRepository authRequestRepository) {
         this.authRequestRepository = authRequestRepository;
     }
 

@@ -2,6 +2,7 @@ package com.talenttrack.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -143,5 +144,10 @@ public class User {
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, username);
+	}
+
+	public Set<Role> getRoles() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

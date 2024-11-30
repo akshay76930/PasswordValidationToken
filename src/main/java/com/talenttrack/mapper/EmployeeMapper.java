@@ -28,7 +28,7 @@ public class EmployeeMapper implements RowMapper<Employee> {
      * Maps each row of the ResultSet to an Employee entity.
      *
      * @param rs The ResultSet to be mapped.
-     * @param rowNum The number of the current row (unused here).
+     * @param rowNum The number of the current row.
      * @return A mapped Employee entity.
      * @throws SQLException if an error occurs while accessing the ResultSet.
      */
@@ -36,14 +36,22 @@ public class EmployeeMapper implements RowMapper<Employee> {
     public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
         Employee employee = new Employee();
 
-        // Mapping each column in the ResultSet to the corresponding field in the Employee object
-        employee.setId(rs.getLong("id"));
-        employee.setName(rs.getString("name"));
-        employee.setContact(rs.getString("contact"));
-        employee.setGender(rs.getString("gender"));
-        employee.setEmail(rs.getString("email"));
+        try {
+            logger.debug("Mapping row number: {}", rowNum);
 
-       
+            // Mapping each column in the ResultSet to the corresponding field in the Employee object
+            employee.setId(rs.getLong("id"));
+            employee.setName(rs.getString("name"));
+            employee.setContact(rs.getString("contact"));
+            employee.setGender(rs.getString("gender"));
+            employee.setEmail(rs.getString("email"));
+
+        } catch (SQLException e) {
+            logger.error("Error mapping row number {}: {}", rowNum, e.getMessage());
+            throw e; // Re-throwing the exception for further handling
+        }
+
+        logger.debug("Successfully mapped row number: {}", rowNum);
         return employee;
     }
 }

@@ -24,19 +24,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.talenttrack.entity.Employee;
 import com.talenttrack.response.ApiResponse;
-import com.talenttrack.service.EmailNotificationService;
+import com.talenttrack.service.EmailSenderService;
 import com.talenttrack.service.EmployeeService;
 
 @RestController
 @RequestMapping("/api/v1/employees")
-public class ApplicationController {
+public class EmployeeController{
 
-	private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
+	private static final Logger logger = LoggerFactory.getLogger(EmployeeController .class);
 	private final EmployeeService employeeService;
-	private final EmailNotificationService emailNotificationService;
+	private final EmailSenderService emailNotificationService;
 
 	@Autowired
-	public ApplicationController(EmployeeService employeeService, EmailNotificationService emailNotificationService) {
+	public EmployeeController (EmployeeService employeeService, EmailSenderService emailNotificationService) {
 		this.employeeService = employeeService;
 		this.emailNotificationService = emailNotificationService;
 	}

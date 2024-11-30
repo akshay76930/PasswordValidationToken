@@ -13,14 +13,14 @@ import com.talenttrack.service.UserService;
 
 @RestController
 @RequestMapping("/api")
-public class UserController {
+public class UserAuthenticationController {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
 
 	private final UserService userService;
 
 	@Autowired
-	public UserController(UserService userService) {
+	public UserAuthenticationController(UserService userService) {
 		this.userService = userService;
 	}
 

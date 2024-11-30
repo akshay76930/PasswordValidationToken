@@ -18,15 +18,15 @@ import com.talenttrack.entity.AuthRequest;
 import com.talenttrack.repository.AuthRequestRepository;
 import com.talenttrack.repository.UserRepository;
 import com.talenttrack.security.JwtUtil;
-import com.talenttrack.service.AuthRequestService;
+import com.talenttrack.service.AuthenticationService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthenticationController {
 
-	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
-	private final AuthRequestService authRequestService;
+	private final AuthenticationService authRequestService;
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;
 	private final BCryptPasswordEncoder passwordEncoder;
@@ -36,8 +36,8 @@ public class AuthController {
 	private long jwtExpiration;
 
 	@Autowired
-	public AuthController(AuthRequestService authRequestService, UserRepository userRepository, JwtUtil jwtUtil,
-			BCryptPasswordEncoder passwordEncoder, AuthRequestRepository authRequestRepository) {
+	public AuthenticationController(AuthenticationService authRequestService, UserRepository userRepository,
+			JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder, AuthRequestRepository authRequestRepository) {
 		this.authRequestService = authRequestService;
 		this.userRepository = userRepository;
 		this.jwtUtil = jwtUtil;
