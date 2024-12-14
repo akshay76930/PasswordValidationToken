@@ -97,7 +97,7 @@ public class EmployeeController{
 
 	@PostMapping("/sendEmail")
 	public ResponseEntity<ApiResponse<String>> sendEmail(@RequestParam String to, @RequestParam String subject) {
-		emailNotificationService.sendEmailWithTemplate(to, subject);
+		emailNotificationService.sendEmailWithTemplate(to, subject, subject);
 		logger.info("Email sent to {} with subject {}", to, subject);
 		return ResponseEntity.ok(new ApiResponse<>("Email sent successfully to " + to));
 	}

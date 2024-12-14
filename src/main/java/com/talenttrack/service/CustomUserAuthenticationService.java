@@ -27,10 +27,9 @@ public class CustomUserAuthenticationService implements UserDetailsService {
 		UserRole userRole = userRoleRepository.findByUsername(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-		// Map roles to authorities
+		
 		Set<GrantedAuthority> authorities = mapRolesToAuthorities(userRole.getRoles());
 
-		// Return UserDetails object with username, password, and authorities
 		return new org.springframework.security.core.userdetails.User(userRole.getUsername(), userRole.getPassword(),
 				authorities);
 	}
@@ -38,7 +37,7 @@ public class CustomUserAuthenticationService implements UserDetailsService {
 	private Set<GrantedAuthority> mapRolesToAuthorities(Set<Role> roles) {
 		Set<GrantedAuthority> authorities = new HashSet<>();
 		for (Role role : roles) {
-			authorities.add(new SimpleGrantedAuthority(role.name())); // assuming Role is an enum
+			authorities.add(new SimpleGrantedAuthority(role.name())); 
 		}
 		return authorities;
 	}

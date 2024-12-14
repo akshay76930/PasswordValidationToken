@@ -23,14 +23,7 @@ public class EmailSenderService {
     @Value("${email.sender}")
     private String emailSender;
 
-    /**
-     * This method sends an email asynchronously using the specified subject.
-     * It uses a simple email content template, but can be expanded to integrate with a more complex template engine.
-     * 
-     * @param to The recipient's email address
-     * @param subject The subject of the email
-     * @param content The content of the email
-     */
+
     @Async
     public void sendEmailWithTemplate(String to, String subject, String content) {
         boolean isSent = sendEmail(to, subject, content);
@@ -42,14 +35,7 @@ public class EmailSenderService {
         }
     }
 
-    /**
-     * Method to construct and send an email.
-     * 
-     * @param to The recipient's email address
-     * @param subject The subject of the email
-     * @param content The body of the email
-     * @return true if the email was sent successfully, false otherwise
-     */
+   
     private boolean sendEmail(String to, String subject, String content) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         
@@ -60,7 +46,6 @@ public class EmailSenderService {
             helper.setText(content, true);  // Use HTML content
             helper.setFrom(emailSender);
 
-            // Send the email using the JavaMailSender
             mailSender.send(mimeMessage);
             return true;
         } catch (MessagingException e) {

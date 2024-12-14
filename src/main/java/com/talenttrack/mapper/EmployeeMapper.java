@@ -16,30 +16,18 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.talenttrack.entity.Employee;
 
-/**
- * RowMapper implementation that maps rows of the result set to Employee objects.
- * This class helps in converting the rows from the database into Employee entity objects.
- */
+
 public class EmployeeMapper implements RowMapper<Employee> {
 
     private static final Logger logger = LoggerFactory.getLogger(EmployeeMapper.class);
 
-    /**
-     * Maps each row of the ResultSet to an Employee entity.
-     *
-     * @param rs The ResultSet to be mapped.
-     * @param rowNum The number of the current row.
-     * @return A mapped Employee entity.
-     * @throws SQLException if an error occurs while accessing the ResultSet.
-     */
     @Override
     public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
         Employee employee = new Employee();
 
         try {
             logger.debug("Mapping row number: {}", rowNum);
-
-            // Mapping each column in the ResultSet to the corresponding field in the Employee object
+ 
             employee.setId(rs.getLong("id"));
             employee.setName(rs.getString("name"));
             employee.setContact(rs.getString("contact"));

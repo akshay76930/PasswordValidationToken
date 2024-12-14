@@ -47,7 +47,6 @@ public class AuthenticationController {
 
 	@PostMapping("/login")
 	public ResponseEntity<String> getToken(@RequestBody AuthRequest authRequest) {
-		// Retrieve the user based on the username
 		Optional<AuthRequest> userOptional = authRequestRepository.findByUsername(authRequest.getUsername());
 
 		return userOptional.filter(user -> passwordEncoder.matches(authRequest.getPassword(), user.getPassword()))
