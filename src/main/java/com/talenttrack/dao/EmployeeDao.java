@@ -20,11 +20,4 @@ public interface EmployeeDao {
 
     Optional<Employee> findById(Long id);
 
-    default boolean employeeExists(Long id) {
-        return findById(id).isPresent();
-    }
-
-    static String normalizeName(String name) {
-        return name == null ? "" : name.trim().toUpperCase();
-    }
 }

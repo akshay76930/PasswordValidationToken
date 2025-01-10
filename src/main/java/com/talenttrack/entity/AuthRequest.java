@@ -19,8 +19,17 @@ public class AuthRequest {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String username;
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	private String password;
 	private String token;
+	private String role;
 
 	// No-argument constructor required by Hibernate
 	public AuthRequest() {
