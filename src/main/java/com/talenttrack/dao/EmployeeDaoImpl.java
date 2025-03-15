@@ -11,7 +11,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +55,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
 		Root<Employee> root = query.from(Employee.class);
 
 		// Apply filter if present
-		Predicate predicate = cb.conjunction(); // Initial predicate is always true
+		Predicate predicate = cb.conjunction();
 		if (filterByName != null && !filterByName.isBlank()) {
 			logger.debug("Applying name filter: '{}'", filterByName);
 			predicate = cb.and(predicate, cb.like(cb.lower(root.get("name")), "%" + filterByName.toLowerCase() + "%"));

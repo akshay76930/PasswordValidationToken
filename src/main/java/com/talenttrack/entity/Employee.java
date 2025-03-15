@@ -27,7 +27,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor // Required for @Builder
+@AllArgsConstructor
 @Builder
 public class Employee implements Serializable {
 
@@ -61,8 +61,9 @@ public class Employee implements Serializable {
     @Column(length = 255)
     private String address;
 
+    // Map to User entity
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)  // user_id can't be null
     @JsonIgnore
     private User user;
 

@@ -20,8 +20,18 @@ public class AuthenticationService {
     }
 
     public AuthRequest saveAuthRequest(AuthRequest authRequest) {
-        AuthRequest savedAuthRequest = authRequestRepository.save(authRequest);
-        logger.info("AuthRequest saved with ID: {}", savedAuthRequest.getId());
-        return savedAuthRequest;
+        if (authRequest == null) {
+            logger.error("Attempted to save a null AuthRequest");
+            throw new IllegalArgumentException("AuthRequest cannot be null");
+        }
+
+        try {
+            AuthRequest savedAuthRequest = authRequestRepository.save(authRequest);
+            logger.info("AuthRequest saved with ID: {}", savedAuthRequest.getId());
+            return savedAuthRequest;
+        } catch (Exception e) {
+            logger.error("Error occurred while saving AuthRequest: {}", e.getMessage());
+            throw new RuntimeException("Error saving AuthRequest", e);
+        }
     }
 }

@@ -1,17 +1,14 @@
 package com.talenttrack.response;
 
 public class ApiResponse<T> {
-
     private T data;
     private String message;
+    private boolean success;
 
-    public ApiResponse(T data) {
+    public ApiResponse(T data, String message, boolean success) {
         this.data = data;
-        this.message = "Success";
-    }
-
-    public ApiResponse(String message) {
         this.message = message;
+        this.success = success;
     }
 
     public T getData() {
@@ -28,5 +25,13 @@ public class ApiResponse<T> {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }
